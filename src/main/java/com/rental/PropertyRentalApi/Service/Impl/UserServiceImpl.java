@@ -56,16 +56,6 @@ public class UserServiceImpl implements UserService {
         return new PaginatedResponse<>(userResponses, paginationMeta);
     }
 
-//    @Override
-//    public List<UserResponse> getAll() {
-//        return userRepository.findAll()
-//                .stream()
-//                .map(mapperFunction::toUserResponse)
-//                .toList();
-//    }
-
-
-
     @Override
     public UserResponse getById(Long id) {
 

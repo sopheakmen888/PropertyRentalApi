@@ -82,12 +82,12 @@ public class SecurityConfig {
                         .requestMatchers("/api/properties/**").hasAnyRole("admin", "agent")
 
                 // DEV: allow all endpoints
-//                                .anyRequest().permitAll()
+                                .anyRequest().permitAll()
 
                 // ============================
                 // PROD (UNCOMMENT)
                 // ============================
-                         .anyRequest().authenticated()
+//                         .anyRequest().authenticated()
                 )
 
                 // ============================

@@ -23,29 +23,10 @@ public class UserController {
     // ==============
     @GetMapping
     public ApiResponse<?> getAllUsers(
-            @RequestParam(required = false) Integer page,
-            @RequestParam(required = false) Integer size
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
     ) {
-//        // If pagination params are provided → paginated
-//        if (page != null && size != null) {
-//            PaginatedResponse<UserResponse> paginatedUsers =
-//                    userService.getAll(page - 1, size);
-//
-//            return new ApiResponse<>(
-//                    200,
-//                    "Get users with pagination successfully.",
-//                    paginatedUsers
-//            );
-//        }
-//
-//        // Otherwise → return all users
-//        return new ApiResponse<>(
-//                200,
-//                "Get all users successfully.",
-//                userService.getAll()
-//        );
-
-        PaginatedResponse<UserResponse> paginatedUsers = userService.getAll(page - 1, size);
+        PaginatedResponse<UserResponse> paginatedUsers = userService.getAll(page, size);
         return new ApiResponse<>(
                 200,
                 true,

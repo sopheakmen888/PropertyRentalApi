@@ -11,9 +11,6 @@ public final class ErrorsExceptionFactory {
         return new ApiException(400, message != null ? message : "Bad request.");
     }
 
-//    public static ApiException notFound(String message) {
-//        return new ApiException(404, message != null ? message : "Data not found.");
-//    }
     public static ApiException notFound(String message) {
         return new ApiException(
             HttpStatus.NOT_FOUND.value(),

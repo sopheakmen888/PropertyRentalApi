@@ -1,11 +1,8 @@
 package com.rental.PropertyRentalApi.Service.Impl;
 
 import com.rental.PropertyRentalApi.DTO.request.RegisterRequest;
-import com.rental.PropertyRentalApi.DTO.response.RegisterResponse;
+import com.rental.PropertyRentalApi.DTO.response.*;
 import com.rental.PropertyRentalApi.DTO.request.AuthRequest;
-import com.rental.PropertyRentalApi.DTO.response.AuthResponse;
-import com.rental.PropertyRentalApi.DTO.response.UserResponse;
-import com.rental.PropertyRentalApi.DTO.response.ApiResponse;
 import com.rental.PropertyRentalApi.Entity.RoleEntity;
 import com.rental.PropertyRentalApi.Entity.UserEntity;
 import com.rental.PropertyRentalApi.Mapper.MapperFunction;
@@ -42,6 +39,24 @@ public class AuthServiceImpl implements AuthService {
     private final CookieHelper cookieHelper;
     private final RoleRepository roleRepository;
     private final MapperFunction mapperFunction;
+
+    @Override
+    public RefreshTokenResponse refreshToken(HttpServletRequest request, HttpServletResponse response) {
+
+        String refreshToken = cookieHelper.getCookieValue(request, "refresh_token");
+
+        if (refreshToken == null || refreshToken.isBlank()) {
+            throw unauthorized("Refresh token is missing!");
+        }
+
+        if (!jwtService.validateToken(refreshToken)) {
+            throw unauthorized("Invalid or expired refresh token.");
+        }
+
+        String userId = jwtService.extractUserId(refreshToken);
+        String username = jwtService.extractUsername(refreshToken);
+        return null;
+    }
 
     @Override
     public RegisterResponse register(
@@ -199,11 +214,12 @@ public class AuthServiceImpl implements AuthService {
         // ========================
         // INCLUDE ACCESS TOKEN IN THE RESPONSE
         // ========================
-        return new AuthResponse(
+        return new ApiResponse<>(
+                200,
+                true,
                 "Login successfully",
-                accessToken,
-                userResponse
-        );
+                new AuthResponse(accessToken, userResponse)
+        ).getData();
     }
 
     @Override
