@@ -4,7 +4,7 @@ import com.rental.PropertyRentalApi.DTO.request.UserCreateRequest;
 import com.rental.PropertyRentalApi.DTO.request.UserUpdateRequest;
 import com.rental.PropertyRentalApi.DTO.response.PaginatedResponse;
 import com.rental.PropertyRentalApi.DTO.response.UserResponse;
-import com.rental.PropertyRentalApi.Entity.UserEntity;
+import com.rental.PropertyRentalApi.Entity.Users;
 import com.rental.PropertyRentalApi.Mapper.MapperFunction;
 import com.rental.PropertyRentalApi.Service.UserService;
 import com.rental.PropertyRentalApi.Repository.UserRepository;
@@ -36,7 +36,7 @@ public class UserServiceImpl implements UserService {
     public PaginatedResponse<UserResponse> getAll(int page, int size) {
 
         Pageable pageable = PageRequest.of(page, size);
-        Page<UserEntity> userPage = userRepository.findAll(pageable);
+        Page<Users> userPage = userRepository.findAll(pageable);
 
         List<UserResponse> userResponses = userPage.getContent()
                 .stream()
@@ -59,7 +59,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponse getById(Long id) {
 
-        UserEntity user = userRepository.findById(id)
+        Users user = userRepository.findById(id)
                 .orElseThrow(() -> notFound("User not found"));
 
         return mapperFunction.toUserResponse(user);
@@ -70,10 +70,10 @@ public class UserServiceImpl implements UserService {
 
         helperFunction.validateCreate(request);
 
-        UserEntity user = mapperFunction.toUserEntity(request);
+        Users user = mapperFunction.toUserEntity(request);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
 
-        UserEntity savedUser = userRepository.save(user);
+        Users savedUser = userRepository.save(user);
 
         return mapperFunction.toUserResponse(savedUser);
     }
@@ -81,12 +81,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponse update(Long id, UserUpdateRequest request) {
 
-        UserEntity user = userRepository.findById(id)
+        Users user = userRepository.findById(id)
                 .orElseThrow(() -> notFound("User not found"));
 
         mapperFunction.updateUserEntity(request, user);
 
-        UserEntity updatedUser = userRepository.save(user);
+        Users updatedUser = userRepository.save(user);
 
         return mapperFunction.toUserResponse(updatedUser);
     }
@@ -94,7 +94,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void delete(Long id) {
 
-        UserEntity user = userRepository.findById(id)
+        Users user = userRepository.findById(id)
                 .orElseThrow(() -> notFound("User not found"));
 
         userRepository.delete(user);

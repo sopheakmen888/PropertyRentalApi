@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "properties")
-public class PropertyEntity {
+public class Properties {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,7 +38,7 @@ public class PropertyEntity {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "created_by", nullable = false)
-    private UserEntity createdBy;
+    private Users createdBy;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;

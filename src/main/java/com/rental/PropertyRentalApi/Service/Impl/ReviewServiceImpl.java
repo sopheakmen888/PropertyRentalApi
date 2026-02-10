@@ -3,9 +3,9 @@ package com.rental.PropertyRentalApi.Service.Impl;
 import com.rental.PropertyRentalApi.DTO.request.ReviewCreateRequest;
 import com.rental.PropertyRentalApi.DTO.request.ReviewUpdateRequest;
 import com.rental.PropertyRentalApi.DTO.response.ReviewResponse;
-import com.rental.PropertyRentalApi.Entity.PropertyEntity;
-import com.rental.PropertyRentalApi.Entity.ReviewEntity;
-import com.rental.PropertyRentalApi.Entity.UserEntity;
+import com.rental.PropertyRentalApi.Entity.Properties;
+import com.rental.PropertyRentalApi.Entity.Reviews;
+import com.rental.PropertyRentalApi.Entity.Users;
 import com.rental.PropertyRentalApi.Mapper.MapperFunction;
 import com.rental.PropertyRentalApi.Repository.PropertyRepository;
 import com.rental.PropertyRentalApi.Repository.ReviewRepository;
@@ -36,10 +36,10 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     public ReviewResponse createReview(Long propertyId, ReviewCreateRequest request) {
         // Get current user
-        UserEntity currentUser = jwtService.getCurrentUser();
+        Users currentUser = jwtService.getCurrentUser();
 
         // Find property
-        PropertyEntity property = propertyRepository.findById(propertyId)
+        Properties property = propertyRepository.findById(propertyId)
                 .orElseThrow(() -> notFound("Property not found."));
 
         // Check if user is trying to review their own property
@@ -62,12 +62,12 @@ public class ReviewServiceImpl implements ReviewService {
         }
 
         // Map request to entity
-        ReviewEntity review = mapper.toReviewEntity(request);
+        Reviews review = mapper.toReviewEntity(request);
         review.setUser(currentUser);
         review.setProperty(property);
 
         // Save review
-        ReviewEntity savedReview = reviewRepository.save(review);
+        Reviews savedReview = reviewRepository.save(review);
 
         return mapper.toReviewResponse(savedReview);
     }
@@ -78,10 +78,10 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     public ReviewResponse updateReview(Long reviewId, ReviewUpdateRequest request) {
         // Get current user
-        UserEntity currentUser = jwtService.getCurrentUser();
+        Users currentUser = jwtService.getCurrentUser();
 
         // Find review
-        ReviewEntity review = reviewRepository.findById(reviewId)
+        Reviews review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> notFound("Review not found."));
 
         // Check if user owns this review
@@ -93,7 +93,7 @@ public class ReviewServiceImpl implements ReviewService {
         mapper.updateReviewEntity(request, review);
 
         // Save updated review
-        ReviewEntity updatedReview = reviewRepository.save(review);
+        Reviews updatedReview = reviewRepository.save(review);
 
         return mapper.toReviewResponse(updatedReview);
     }
@@ -104,10 +104,10 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     public void deleteReview(Long reviewId) {
         // Get current user
-        UserEntity currentUser = jwtService.getCurrentUser();
+        Users currentUser = jwtService.getCurrentUser();
 
         // Find review
-        ReviewEntity review = reviewRepository.findById(reviewId)
+        Reviews review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> notFound("Review not found."));
 
         // Check if user owns this review
@@ -125,14 +125,14 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     public Page<ReviewResponse> getReviewsByProperty(Long propertyId, int page, int size) {
         // Find property
-        PropertyEntity property = propertyRepository.findById(propertyId)
+        Properties property = propertyRepository.findById(propertyId)
                 .orElseThrow(() -> notFound("Property not found."));
 
         // Create pageable
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
 
         // Fetch reviews
-        Page<ReviewEntity> reviewPage = reviewRepository.findAllByProperty(property, pageable);
+        Page<Reviews> reviewPage = reviewRepository.findAllByProperty(property, pageable);
 
         // Map to response
         return reviewPage.map(mapper::toReviewResponse);
@@ -144,13 +144,13 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     public Page<ReviewResponse> getCurrentUserReviews(int page, int size) {
         // Get current user
-        UserEntity currentUser = jwtService.getCurrentUser();
+        Users currentUser = jwtService.getCurrentUser();
 
         // Create pageable
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
 
         // Fetch user's reviews
-        Page<ReviewEntity> reviewPage = reviewRepository.findAllByUser(currentUser, pageable);
+        Page<Reviews> reviewPage = reviewRepository.findAllByUser(currentUser, pageable);
 
         // Map to response
         return reviewPage.map(mapper::toReviewResponse);
@@ -161,7 +161,7 @@ public class ReviewServiceImpl implements ReviewService {
     // ==============
     @Override
     public ReviewResponse getReviewById(Long reviewId) {
-        ReviewEntity review = reviewRepository.findById(reviewId)
+        Reviews review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> notFound("Review not found."));
 
         return mapper.toReviewResponse(review);

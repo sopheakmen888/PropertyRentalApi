@@ -1,7 +1,7 @@
 package com.rental.PropertyRentalApi.DTO.response;
 
-import com.rental.PropertyRentalApi.Entity.RoleEntity;
-import com.rental.PropertyRentalApi.Entity.UserEntity;
+import com.rental.PropertyRentalApi.Entity.Roles;
+import com.rental.PropertyRentalApi.Entity.Users;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,14 +19,14 @@ public class UserResponse {
     private String email;
     private List<String> roles;
 
-    public UserResponse(UserEntity userEntity) {
-        this.id = userEntity.getId();
-        this.fullname = userEntity.getFullname();
-        this.username = userEntity.getUsername();
-        this.email = userEntity.getEmail();
-        this.roles = userEntity.getRoles()
+    public UserResponse(Users users) {
+        this.id = users.getId();
+        this.fullname = users.getFullname();
+        this.username = users.getUsername();
+        this.email = users.getEmail();
+        this.roles = users.getRoles()
                 .stream()
-                .map(RoleEntity::getName) // extract name
+                .map(Roles::getName) // extract name
                 .collect(Collectors.toList());
     }
 }

@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(
         name = "reviews",
+        indexes = @Index(name = "idx_review_property", columnList="property_id"),
         uniqueConstraints = @UniqueConstraint(
                 columnNames = {"user_id", "property_id"},
                 name = "unique_user_property_review"
@@ -20,7 +21,7 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReviewEntity {
+public class Reviews {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,11 +35,11 @@ public class ReviewEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private UserEntity user;
+    private Users user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "property_id", nullable = false)
-    private PropertyEntity property;
+    private Properties property;
 
     @CreationTimestamp
     @Column(updatable = false)

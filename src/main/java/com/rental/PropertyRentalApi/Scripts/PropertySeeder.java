@@ -1,7 +1,7 @@
 package com.rental.PropertyRentalApi.Scripts;
 
-import com.rental.PropertyRentalApi.Entity.PropertyEntity;
-import com.rental.PropertyRentalApi.Entity.UserEntity;
+import com.rental.PropertyRentalApi.Entity.Properties;
+import com.rental.PropertyRentalApi.Entity.Users;
 import com.rental.PropertyRentalApi.Repository.PropertyRepository;
 import com.rental.PropertyRentalApi.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +27,7 @@ public class PropertySeeder implements CommandLineRunner {
         log.info("Seeding properties...");
 
         // ✅ Get a user to own seeded properties
-        UserEntity owner = userRepository.findByUsername("admin")
+        Users owner = userRepository.findByUsername("admin")
                 .orElseThrow(() -> new RuntimeException("Admin user not found. Seed users first."));
 
         seedProperty(owner,
@@ -58,7 +58,7 @@ public class PropertySeeder implements CommandLineRunner {
     }
 
     private void seedProperty(
-            UserEntity owner,
+            Users owner,
             String title,
             String description,
             String address,
@@ -72,7 +72,7 @@ public class PropertySeeder implements CommandLineRunner {
             return;
         }
 
-        PropertyEntity property = new PropertyEntity();
+        Properties property = new Properties();
         property.setTitle(title);
         property.setDescription(description);
         property.setAddress(address);
