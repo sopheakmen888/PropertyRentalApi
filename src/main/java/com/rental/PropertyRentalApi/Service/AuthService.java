@@ -19,10 +19,17 @@ public interface AuthService {
             HttpServletResponse response
     );
 
-    RegisterResponse register(RegisterRequest request,
-                              HttpServletResponse response);
-    AuthResponse login(AuthRequest request,
-                       HttpServletResponse response);
+    RegisterResponse register(
+            RegisterRequest request,
+            HttpServletResponse response
+    );
+    AuthResponse login(
+            AuthRequest request,
+            HttpServletResponse response
+    );
 
-    ApiResponse<Object> logout(HttpServletRequest request, HttpServletResponse response);
+    ApiResponse<Object> logout(
+            HttpServletRequest request,
+            HttpServletResponse response
+    );
 }

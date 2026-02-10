@@ -3,9 +3,11 @@ package com.rental.PropertyRentalApi.Service.Impl;
 import com.rental.PropertyRentalApi.DTO.request.RegisterRequest;
 import com.rental.PropertyRentalApi.DTO.response.*;
 import com.rental.PropertyRentalApi.DTO.request.AuthRequest;
-import com.rental.PropertyRentalApi.Entity.RoleEntity;
-import com.rental.PropertyRentalApi.Entity.UserEntity;
+import com.rental.PropertyRentalApi.Entity.RefreshToken;
+import com.rental.PropertyRentalApi.Entity.Roles;
+import com.rental.PropertyRentalApi.Entity.Users;
 import com.rental.PropertyRentalApi.Mapper.MapperFunction;
+import com.rental.PropertyRentalApi.Repository.RefreshTokenRepository;
 import com.rental.PropertyRentalApi.Repository.RoleRepository;
 import com.rental.PropertyRentalApi.Repository.UserRepository;
 import com.rental.PropertyRentalApi.Service.AuthService;
@@ -24,9 +26,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -39,38 +44,100 @@ public class AuthServiceImpl implements AuthService {
     private final CookieHelper cookieHelper;
     private final RoleRepository roleRepository;
     private final MapperFunction mapperFunction;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     @Override
-    public RefreshTokenResponse refreshToken(HttpServletRequest request, HttpServletResponse response) {
+    public RefreshTokenResponse refreshToken(
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) {
 
-        String refreshToken = cookieHelper.getCookieValue(request, "refresh_token");
+        // ========================
+        // GET REFRESH TOKEN FROM COOKIE
+        // ========================
+        String refreshTokenValue =
+                cookieHelper.getCookieValue(request, "refreshToken");
 
-        if (refreshToken == null || refreshToken.isBlank()) {
-            throw unauthorized("Refresh token is missing!");
+        if (refreshTokenValue == null) {
+            throw unauthorized("Refresh token missing");
         }
 
-        if (!jwtService.validateToken(refreshToken)) {
-            throw unauthorized("Invalid or expired refresh token.");
+        // ========================
+        // LOOK UP REFRESH TOKEN IN DATABASE
+        // ========================
+        RefreshToken oldToken = refreshTokenRepository
+                .findByToken(refreshTokenValue)
+                .orElseThrow(() -> unauthorized("Invalid refresh token"));
+
+        // ========================
+        // VALIDATE REFRESH TOKEN
+        // - Must not be revoked
+        // - Must not be expired
+        // ========================
+        if (oldToken.isRevoked() || oldToken.getExpiresAt().isBefore(Instant.now())) {
+            throw unauthorized("Refresh token expired or revoked");
         }
 
-        String userId = jwtService.extractUserId(refreshToken);
-        String username = jwtService.extractUsername(refreshToken);
+        // ========================
+        // REUSE DETECTION (ROTATION)
+        // Invalidate the old refresh token immediately
+        // ========================
+        oldToken.setRevoked(true);
+        refreshTokenRepository.save(oldToken);
 
-//        UserEntity user = userRepository.findById(Long.parseLong(userId))
-//                .orElseThrow(() -> notFound("User not found."));
-        UserEntity user = userRepository.findById(Long.valueOf(userId))
-                .orElseThrow(() -> notFound("User not found."));
+        // ========================
+        // EXTRACT USER FROM TOKEN
+        // ========================
+        Users user = oldToken.getUsers();
 
-        if (!user.getUsername().equals(username)) {
-            throw unauthorized("Invalid refresh token.");
-        }
+        // ========================
+        // GENERATE NEW ACCESS TOKEN (JWT)
+        // ========================
+        String newAccessToken = jwtService.generateAccessToken(
+                String.valueOf(user.getId()),
+                user.getEmail(),
+                user.getUsername(),
+                user.getRoles()
+                        .stream()
+                        .map(Roles::getName)
+                        .toList()
+        );
 
-        List<String> roles = user.getRoles()
-                .stream()
-                .map(RoleEntity::getName)
-                .toList();
+        // ========================
+        // CREATE NEW REFRESH TOKEN (SERVER-SIDE)
+        // ========================
+        String newRefreshTokenValue = UUID.randomUUID().toString();
 
-        return null;
+        RefreshToken newToken = new RefreshToken();
+        newToken.setToken(newRefreshTokenValue);
+        newToken.setUsers(user);
+        newToken.setExpiresAt(
+                Instant.now().plus(30, ChronoUnit.DAYS)
+        );
+
+        refreshTokenRepository.save(newToken);
+
+        // ========================
+        // STORE NEW TOKENS IN HTTP-ONLY COOKIES
+        // ========================
+        cookieHelper.setAuthCookie(
+                response,
+                "accessToken",
+                newAccessToken,
+                300 // 5 minutes
+        );
+
+        cookieHelper.setAuthCookie(
+                response,
+                "refreshToken",
+                newRefreshTokenValue,
+                259200 // 30 days
+        );
+
+        // ========================
+        // RETURN NEW ACCESS TOKEN
+        // ========================
+        return new RefreshTokenResponse(newAccessToken);
     }
 
     @Override
@@ -91,7 +158,7 @@ public class AuthServiceImpl implements AuthService {
         // ========================
         // MAP REQUEST TO ENTITY USING MAPSTRUCT
         // ========================
-        UserEntity user = mapperFunction.toUserEntity(request);
+        Users user = mapperFunction.toUserEntity(request);
 
         // Set encoded password (can't be done by MapStruct)
         user.setPassword(passwordEncoder.encode(request.getPassword()));
@@ -100,13 +167,13 @@ public class AuthServiceImpl implements AuthService {
         // ASSIGN ROLES TO USER
         // ========================
         if (request.getRoles() != null && !request.getRoles().isEmpty()) {
-            List<RoleEntity> roles = roleRepository.findAllById(request.getRoles());
+            List<Roles> roles = roleRepository.findAllById(request.getRoles());
             if (roles.size() != request.getRoles().size()) {
                 throw badRequest("Some roles not found.");
             }
             user.setRoles(new HashSet<>(roles));
         } else {
-            RoleEntity defaultRole = roleRepository.findByName("user")
+            Roles defaultRole = roleRepository.findByName("user")
                     .orElseThrow(() -> notFound("Default role not found."));
             user.setRoles(new HashSet<>(Set.of(defaultRole)));
         }
@@ -114,7 +181,7 @@ public class AuthServiceImpl implements AuthService {
         // ========================
         // SAVE USER
         // ========================
-        UserEntity savedUser = userRepository.save(user);
+        Users savedUser = userRepository.save(user);
 
         // ========================
         // EXTRACT ROLE NAMES
@@ -122,7 +189,7 @@ public class AuthServiceImpl implements AuthService {
         // List<String> roles = mapperFunction.mapRolesToStringList(savedUser.getRoles());
         List<String> roles = user.getRoles()
                 .stream()
-                .map(RoleEntity::getName)
+                .map(Roles::getName)
                 .toList();
 
         // ========================
@@ -135,9 +202,19 @@ public class AuthServiceImpl implements AuthService {
                 roles
         );
 
-        String refreshToken = jwtService.generateRefreshToken(
-                String.valueOf(savedUser.getId())
+        // ========================
+        // DB BACKEND REFRESH TOKEN
+        // ========================
+        String refreshTokenValue = UUID.randomUUID().toString();
+
+        RefreshToken refreshToken = new RefreshToken();
+        refreshToken.setToken(refreshTokenValue);
+        refreshToken.setUsers(user);
+        refreshToken.setExpiresAt(
+                Instant.now().plus(30, ChronoUnit.DAYS)
         );
+
+        refreshTokenRepository.save(refreshToken);
 
         // ========================
         // SAVE TOKENS IN COOKIE
@@ -152,7 +229,7 @@ public class AuthServiceImpl implements AuthService {
         cookieHelper.setAuthCookie(
                 response,
                 "refreshToken",
-                refreshToken,
+                refreshTokenValue,
                 259200 // 30 days
         );
 
@@ -175,7 +252,7 @@ public class AuthServiceImpl implements AuthService {
             HttpServletResponse response
     ) {
 
-        UserEntity user = userRepository.findByEmail(request.getEmail())
+        Users user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> notFound("User not found."));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
@@ -187,7 +264,7 @@ public class AuthServiceImpl implements AuthService {
         // ========================
         List<String> roles = user.getRoles()
                 .stream()
-                .map(RoleEntity::getName)
+                .map(Roles::getName)
                 .toList();
 
         // ========================
@@ -196,7 +273,7 @@ public class AuthServiceImpl implements AuthService {
         UserResponse userResponse = mapperFunction.toUserResponse(user);
 
         // ========================
-        // GENERATE TOKENS
+        // GENERATE ACCESS TOKENS
         // ========================
         String accessToken = jwtService.generateAccessToken(
                 String.valueOf(user.getId()),
@@ -205,9 +282,19 @@ public class AuthServiceImpl implements AuthService {
                 roles
         );
 
-        String refreshToken = jwtService.generateRefreshToken(
-                String.valueOf(user.getId())
+        // ========================
+        // DB BACKEND REFRESH TOKEN
+        // ========================
+        String refreshTokenValue = UUID.randomUUID().toString();
+
+        RefreshToken refreshToken = new RefreshToken();
+        refreshToken.setToken(refreshTokenValue);
+        refreshToken.setUsers(user);
+        refreshToken.setExpiresAt(
+                Instant.now().plus(30, ChronoUnit.DAYS)
         );
+
+        refreshTokenRepository.save(refreshToken);
 
         // ========================
         // SAVE TOKENS IN COOKIE
@@ -222,7 +309,7 @@ public class AuthServiceImpl implements AuthService {
         cookieHelper.setAuthCookie(
                 response,
                 "refreshToken",
-                refreshToken,
+                refreshTokenValue,
                 259200 // 30 days
         );
 
@@ -241,7 +328,15 @@ public class AuthServiceImpl implements AuthService {
     public ApiResponse<Object> logout(HttpServletRequest request, HttpServletResponse response) {
 
         String accessToken = cookieHelper.getCookieValue(request, "accessToken");
-        String refreshToken = cookieHelper.getCookieValue(request, "refreshToken");
+        String refreshTokenValue = cookieHelper.getCookieValue(request, "refreshToken");
+
+        if (refreshTokenValue != null) {
+            refreshTokenRepository.findByToken(refreshTokenValue)
+                    .ifPresent(token -> {
+                        token.setRevoked(true);
+                        refreshTokenRepository.save(token);
+                    });
+        }
 
         cookieHelper.clearAuthCookie(response, "accessToken");
         cookieHelper.clearAuthCookie(response, "refreshToken");

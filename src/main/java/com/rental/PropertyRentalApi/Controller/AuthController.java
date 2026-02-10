@@ -7,7 +7,6 @@ import com.rental.PropertyRentalApi.DTO.response.AuthResponse;
 import com.rental.PropertyRentalApi.DTO.response.RegisterResponse;
 import com.rental.PropertyRentalApi.Service.AuthService;
 
-import com.rental.PropertyRentalApi.Utils.CookieHelper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -21,7 +20,20 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
-    private final CookieHelper cookieHelper;
+
+    // ========================
+    // REFRESH ACCESS TOKEN
+    // Uses refresh token from HTTP-only cookie
+    // ========================
+    @PostMapping("/refresh-token")
+    public ResponseEntity<?> refreshToken(
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) {
+        return ResponseEntity.ok(
+                authService.refreshToken(request, response)
+        );
+    }
 
     @PostMapping("/register")
     public ResponseEntity<RegisterResponse> register(

@@ -24,12 +24,12 @@ public class PropertyController {
     // ==============
     @GetMapping
     public ApiResponse<PaginatedResponse<PropertyResponse>> getAllProperties(
-            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
         // Convert page to 0-indexed for service layer
         PaginatedResponse<PropertyResponse> paginatedProperties =
-                propertyService.getAll(page - 1, size);
+                propertyService.getAll(page, size);
 
         return new ApiResponse<>(
                 200,
@@ -38,20 +38,6 @@ public class PropertyController {
                 paginatedProperties
         );
     }
-
-    // ========================
-    // GET ALL
-    // ========================
-//    @GetMapping
-//    public ApiResponse<List<PropertyResponse>> getAllProperties() {
-//        List<PropertyResponse> properties = propertyService.getAll();
-//
-//        return new ApiResponse<>(
-//                200,
-//                "Get all properties successfully.",
-//                properties
-//        );
-//    }
 
     // ========================
     // GET BY ID

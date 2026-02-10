@@ -1,6 +1,6 @@
 package com.rental.PropertyRentalApi.Service.Jwt;
 
-import com.rental.PropertyRentalApi.Entity.UserEntity;
+import com.rental.PropertyRentalApi.Entity.Users;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -174,13 +174,13 @@ public class JwtService {
      * 👤 CURRENT USER
      * =========================
      */
-    public UserEntity getCurrentUser() {
+    public Users getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null || !authentication.isAuthenticated()) {
             throw unauthorized("User not Authenticated");
         }
 
-        return (UserEntity) authentication.getPrincipal();
+        return (Users) authentication.getPrincipal();
     }
 }

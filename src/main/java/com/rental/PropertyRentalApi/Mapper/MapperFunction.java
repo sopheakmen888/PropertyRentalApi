@@ -4,10 +4,10 @@ import com.rental.PropertyRentalApi.DTO.request.*;
 import com.rental.PropertyRentalApi.DTO.response.PropertyResponse;
 import com.rental.PropertyRentalApi.DTO.response.ReviewResponse;
 import com.rental.PropertyRentalApi.DTO.response.UserResponse;
-import com.rental.PropertyRentalApi.Entity.PropertyEntity;
-import com.rental.PropertyRentalApi.Entity.ReviewEntity;
-import com.rental.PropertyRentalApi.Entity.RoleEntity;
-import com.rental.PropertyRentalApi.Entity.UserEntity;
+import com.rental.PropertyRentalApi.Entity.Properties;
+import com.rental.PropertyRentalApi.Entity.Reviews;
+import com.rental.PropertyRentalApi.Entity.Roles;
+import com.rental.PropertyRentalApi.Entity.Users;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -21,18 +21,18 @@ public interface MapperFunction {
     // ==============
     // PROPERTY REQUEST MAPPINGS
     // ==============
-    PropertyEntity toPropertyEntity(PropertyCreateRequest request);
+    Properties toPropertyEntity(PropertyCreateRequest request);
 
     void updatePropertyEntity(
             PropertyUpdateRequest request,
-            @MappingTarget PropertyEntity entity
+            @MappingTarget Properties entity
     );
 
     // ==============
     // PROPERTY RESPONSE MAPPINGS
     // ==============
     @Mapping(source = "createdBy", target = "createdBy")
-    PropertyResponse toPropertyResponse(PropertyEntity property);
+    PropertyResponse toPropertyResponse(Properties property);
 
     // ==============
     // REGISTER REQUEST MAPPINGS
@@ -42,34 +42,34 @@ public interface MapperFunction {
     @Mapping(target = "roles", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    UserEntity toUserEntity(RegisterRequest request);
+    Users toUserEntity(RegisterRequest request);
 
 
     // ==============
     // USER REQUEST MAPPINGS
     // ==============
-    UserEntity toUserEntity(UserCreateRequest request);
+    Users toUserEntity(UserCreateRequest request);
 
     void updateUserEntity(
             UserUpdateRequest request,
-            @MappingTarget UserEntity entity
+            @MappingTarget Users entity
     );
 
     // ==============
     // USER RESPONSE MAPPINGS
     // ==============
     @Mapping(target = "roles", source = "roles")
-    UserResponse toUserResponse(UserEntity user);
+    UserResponse toUserResponse(Users user);
 
     // ==============
     // ROLES MAPPINGS
     // ==============
-    default List<String> mapRoles(Set<RoleEntity> roles) {
+    default List<String> mapRoles(Set<Roles> roles) {
         if (roles == null) {
             return List.of();
         }
         return roles.stream()
-                .map(RoleEntity::getName)
+                .map(Roles::getName)
                 .toList();
     }
 
@@ -81,7 +81,7 @@ public interface MapperFunction {
     @Mapping(target = "property", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    ReviewEntity toReviewEntity(ReviewCreateRequest request);
+    Reviews toReviewEntity(ReviewCreateRequest request);
 
     // ==============
     // REVIEW UPDATE REQUEST MAPPINGS
@@ -91,7 +91,7 @@ public interface MapperFunction {
     @Mapping(target = "property", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    void updateReviewEntity(ReviewUpdateRequest request, @MappingTarget ReviewEntity entity);
+    void updateReviewEntity(ReviewUpdateRequest request, @MappingTarget Reviews entity);
 
     // ==============
     // REVIEW RESPONSE MAPPINGS
@@ -99,5 +99,5 @@ public interface MapperFunction {
     @Mapping(source = "user", target = "user")
     @Mapping(source = "property.id", target = "propertyId")
     @Mapping(source = "property.title", target = "propertyTitle")
-    ReviewResponse toReviewResponse(ReviewEntity entity);
+    ReviewResponse toReviewResponse(Reviews entity);
 }
