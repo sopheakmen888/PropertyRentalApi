@@ -55,6 +55,21 @@ public class AuthServiceImpl implements AuthService {
 
         String userId = jwtService.extractUserId(refreshToken);
         String username = jwtService.extractUsername(refreshToken);
+
+//        UserEntity user = userRepository.findById(Long.parseLong(userId))
+//                .orElseThrow(() -> notFound("User not found."));
+        UserEntity user = userRepository.findById(Long.valueOf(userId))
+                .orElseThrow(() -> notFound("User not found."));
+
+        if (!user.getUsername().equals(username)) {
+            throw unauthorized("Invalid refresh token.");
+        }
+
+        List<String> roles = user.getRoles()
+                .stream()
+                .map(RoleEntity::getName)
+                .toList();
+
         return null;
     }
 
