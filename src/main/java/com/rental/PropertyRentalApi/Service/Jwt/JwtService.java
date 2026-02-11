@@ -33,7 +33,7 @@ public class JwtService {
 
     /*
      * =========================
-     * 🔐 JWT CONFIG
+     * JWT CONFIG
      * =========================
      */
     @Value("${spring.jwt-secret}")
@@ -47,7 +47,7 @@ public class JwtService {
 
     /*
      * =========================
-     * 🔑 SIGNING KEY
+     * SIGNING KEY
      * =========================
      */
     private SecretKey getSignKey() {
@@ -56,7 +56,7 @@ public class JwtService {
 
     /*
      * =========================
-     * 🧠 CLAIMS CORE
+     * CLAIMS CORE
      * =========================
      */
     private Claims extractAllClaims(String token) {
@@ -73,7 +73,7 @@ public class JwtService {
 
     /*
      * =========================
-     * 🎟 TOKEN GENERATION
+     * TOKEN GENERATION
      * =========================
      */
     public String generateAccessToken(
@@ -121,7 +121,7 @@ public class JwtService {
 
     /*
      * =========================
-     * 🔍 CLAIM EXTRACTORS
+     * CLAIM EXTRACTORS
      * =========================
      */
     public String extractUsername(String token) {
@@ -142,7 +142,7 @@ public class JwtService {
 
     /*
      * =========================
-     * ✅ VALIDATION
+     * VALIDATION
      * =========================
      */
     private boolean isTokenExpired(String token) {
@@ -171,7 +171,7 @@ public class JwtService {
 
     /*
      * =========================
-     * 👤 CURRENT USER
+     * CURRENT USER
      * =========================
      */
     public Users getCurrentUser() {

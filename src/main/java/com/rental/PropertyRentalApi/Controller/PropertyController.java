@@ -14,7 +14,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/properties")
+@RequestMapping("/api")
 public class PropertyController {
 
     private final PropertyService propertyService;
@@ -22,7 +22,7 @@ public class PropertyController {
     // ==============
     // GET ALL WITH PAGINATION
     // ==============
-    @GetMapping
+    @GetMapping("/public/properties")
     public ApiResponse<PaginatedResponse<PropertyResponse>> getAllProperties(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
@@ -42,7 +42,7 @@ public class PropertyController {
     // ========================
     // GET BY ID
     // ========================
-    @GetMapping("/{id}")
+    @GetMapping("/public/properties/{id}")
     public ApiResponse<PropertyResponse> getPropertById(@PathVariable Long id) {
         PropertyResponse property = propertyService.getById(id);
 
@@ -57,7 +57,7 @@ public class PropertyController {
     // ==============
     // CREATE
     // ==============
-    @PostMapping
+    @PostMapping("/properties")
     public ApiResponse<PropertyResponse> createdProperty(
             @Valid
             @RequestBody PropertyCreateRequest request) {
@@ -74,7 +74,7 @@ public class PropertyController {
     // ========================
     // UPDATE
     // ========================
-    @PutMapping("/{id}")
+    @PutMapping("/properties/{id}")
     public ApiResponse<PropertyResponse> updateProperty(
             @PathVariable Long id,
             @Valid @RequestBody PropertyUpdateRequest request
@@ -92,7 +92,7 @@ public class PropertyController {
     // ========================
     // DELETE
     // ========================
-    @DeleteMapping("/{id}")
+    @DeleteMapping("properties/{id}")
     public ApiResponse<Void> deleteProperty(@PathVariable Long id) {
 
         propertyService.delete(id);
