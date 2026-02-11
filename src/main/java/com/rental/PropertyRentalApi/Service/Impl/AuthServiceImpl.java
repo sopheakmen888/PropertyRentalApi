@@ -137,7 +137,12 @@ public class AuthServiceImpl implements AuthService {
         // ========================
         // RETURN NEW ACCESS TOKEN
         // ========================
-        return new RefreshTokenResponse(newAccessToken);
+        return new RefreshTokenResponse(
+                201,
+                true,
+                "Refresh token generate successfully.",
+                newAccessToken
+        );
     }
 
     @Override
@@ -238,12 +243,12 @@ public class AuthServiceImpl implements AuthService {
         // ========================
         UserResponse userResponse = mapperFunction.toUserResponse(savedUser);
 
-        return new ApiResponse<>(
+        return new RegisterResponse(
                 201,
                 true,
                 "Register successfully.",
-                new RegisterResponse(userResponse)
-        ).getData();
+                userResponse
+        );
     }
 
     @Override
@@ -313,15 +318,13 @@ public class AuthServiceImpl implements AuthService {
                 259200 // 30 days
         );
 
-        // ========================
-        // INCLUDE ACCESS TOKEN IN THE RESPONSE
-        // ========================
-        return new ApiResponse<>(
+        return new AuthResponse(
                 200,
                 true,
-                "Login successfully",
-                new AuthResponse(accessToken, userResponse)
-        ).getData();
+                "Login successfully.",
+                accessToken,
+                userResponse
+        );
     }
 
     @Override
@@ -341,6 +344,10 @@ public class AuthServiceImpl implements AuthService {
         cookieHelper.clearAuthCookie(response, "accessToken");
         cookieHelper.clearAuthCookie(response, "refreshToken");
 
-        return new ApiResponse<>(false, "User logout successfully.");
+        return new ApiResponse<>(
+                200,
+                true,
+                "User logout successfully."
+        );
     }
 }
