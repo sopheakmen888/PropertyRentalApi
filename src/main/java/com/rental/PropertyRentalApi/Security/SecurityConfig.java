@@ -63,9 +63,9 @@ public class SecurityConfig {
                     config.addExposedHeader("*");
 
                     // PROD: restrict headers
-                    // config.addAllowedHeader("Authorization");
-                    // config.addAllowedHeader("Content-Type");
-                    // config.addExposedHeader("Authorization");
+//                     config.addAllowedHeader("Authorization");
+//                     config.addAllowedHeader("Content-Type");
+//                     config.addExposedHeader("Authorization");
 
                     // Allow cookies / Authorization header
                     config.setAllowCredentials(true);
@@ -78,6 +78,12 @@ public class SecurityConfig {
                 // ============================
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
+                                .requestMatchers("/api/public/**").permitAll()
+                                .requestMatchers("/api/reviews/**").permitAll()
+
+                        // ============================
+                        // ROLE BASE AUTHORIZATION
+                        // ============================
                         .requestMatchers("/api/users/**").hasRole("admin")
                         .requestMatchers("/api/properties/**").hasAnyRole("admin", "agent")
 
