@@ -84,7 +84,8 @@ public class SecurityConfig {
                         // ============================
                         // ROLE BASE AUTHORIZATION
                         // ============================
-                        .requestMatchers("/api/users/**").hasRole("admin")
+//                        .requestMatchers("/api/users/**").hasRole("admin")
+                                .requestMatchers("/api/users/**").permitAll()
                         .requestMatchers("/api/properties/**").hasAnyRole("admin", "agent")
 
                 // DEV: allow all endpoints
