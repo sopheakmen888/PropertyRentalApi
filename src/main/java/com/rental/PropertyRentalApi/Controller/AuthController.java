@@ -38,18 +38,20 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<RegisterResponse> register(
             @RequestBody RegisterRequest request,
+            HttpServletRequest httpRequest,
             HttpServletResponse response
     ) {
-        RegisterResponse result = authService.register(request, response);
+        RegisterResponse result = authService.register(request, httpRequest, response);
         return ResponseEntity.ok(result);
     }
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(
             @RequestBody AuthRequest request,
+            HttpServletRequest httpRequest,
             HttpServletResponse response
     ) {
-        AuthResponse result = authService.login(request, response);
+        AuthResponse result = authService.login(request, httpRequest, response);
         return ResponseEntity.ok(result);
     }
 

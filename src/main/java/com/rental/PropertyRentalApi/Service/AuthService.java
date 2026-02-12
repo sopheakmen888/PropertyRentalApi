@@ -21,10 +21,12 @@ public interface AuthService {
 
     RegisterResponse register(
             RegisterRequest request,
+            HttpServletRequest httpRequest,
             HttpServletResponse response
     );
     AuthResponse login(
             AuthRequest request,
+            HttpServletRequest httpRequest,
             HttpServletResponse response
     );
 
