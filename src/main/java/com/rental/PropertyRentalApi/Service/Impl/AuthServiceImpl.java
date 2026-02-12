@@ -19,6 +19,7 @@ import static com.rental.PropertyRentalApi.Exception.ErrorsExceptionFactory.notF
 import static com.rental.PropertyRentalApi.Exception.ErrorsExceptionFactory.unauthorized;
 import static com.rental.PropertyRentalApi.Exception.ErrorsExceptionFactory.badRequest;
 
+import com.rental.PropertyRentalApi.Utils.HelperFunction;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -45,6 +46,7 @@ public class AuthServiceImpl implements AuthService {
     private final RoleRepository roleRepository;
     private final MapperFunction mapperFunction;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final HelperFunction helperFunction;
 
     @Override
     public RefreshTokenResponse refreshToken(
@@ -160,6 +162,9 @@ public class AuthServiceImpl implements AuthService {
             throw badRequest("Email already exists");
         }
 
+        // Validate email format
+        helperFunction.validateEmailFormat(request.getEmail());
+
         // ========================
         // MAP REQUEST TO ENTITY USING MAPSTRUCT
         // ========================
@@ -187,6 +192,11 @@ public class AuthServiceImpl implements AuthService {
         // SAVE USER
         // ========================
         Users savedUser = userRepository.save(user);
+
+        // ============================
+        // Track device login
+        // ============================
+
 
         // ========================
         // EXTRACT ROLE NAMES
