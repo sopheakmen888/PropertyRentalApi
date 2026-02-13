@@ -5,7 +5,6 @@ import com.rental.PropertyRentalApi.DTO.request.PropertyUpdateRequest;
 import com.rental.PropertyRentalApi.DTO.response.PaginatedResponse;
 import com.rental.PropertyRentalApi.DTO.response.PropertyResponse;
 import com.rental.PropertyRentalApi.Entity.*;
-import com.rental.PropertyRentalApi.Mapper.MapperConfiguration;
 import com.rental.PropertyRentalApi.Mapper.PropertyMapper;
 import com.rental.PropertyRentalApi.Repository.*;
 import com.rental.PropertyRentalApi.Service.Jwt.JwtService;
