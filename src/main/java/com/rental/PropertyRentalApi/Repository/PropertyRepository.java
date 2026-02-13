@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface PropertiesRepository extends JpaRepository<Properties, Long> {
+public interface PropertyRepository extends JpaRepository<Properties, Long> {
 
         boolean existsByTitle(String title);
 
