@@ -7,5 +7,4 @@ import jakarta.validation.constraints.NotBlank;
 public class CategoryCreateRequest {
     @NotBlank
     private String name;
-    private String description;
 }

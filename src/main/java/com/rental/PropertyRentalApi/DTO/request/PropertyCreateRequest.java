@@ -6,7 +6,6 @@ import jakarta.validation.constraints.Positive;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 @Data
 public class PropertyCreateRequest {
@@ -30,7 +29,4 @@ public class PropertyCreateRequest {
 //    @NotNull(message = "Category Name is required")
     @NotBlank(message = "Category Name is required")
     private String categoryName;
-
-//    @NotBlank(message = "Image is required")
-    private List<String> images;
 }

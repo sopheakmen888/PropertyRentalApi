@@ -15,13 +15,5 @@ public interface PropertyService {
     PropertyResponse update(Long id, PropertyUpdateRequest request);
     void delete(Long id);
 
-
-    void addFavorite(Long propertyId, Long userId);
-
-    void removeFavorite(Long propertyId, Long userId);
-
     List<PropertyResponse> getPropertiesByCurrentUser();
-
-    // ===== Search / Filter =====
-//    List<PropertyResponse> searchProperties(String categoryName, Double minPrice, Double maxPrice);
 }

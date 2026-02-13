@@ -1,11 +1,11 @@
 package com.rental.PropertyRentalApi.DTO.request;
 
+import com.rental.PropertyRentalApi.DTO.response.CategoryResponse;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 @Data
 public class PropertyUpdateRequest {
@@ -26,9 +26,5 @@ public class PropertyUpdateRequest {
     private BigDecimal electricityCost;
     private BigDecimal waterCost;
 
-    @NotBlank(message = "Category Name is required")
     private String categoryName;
-
-//    @NotBlank(message = "Image is required")
-    private List<String> images;
 }

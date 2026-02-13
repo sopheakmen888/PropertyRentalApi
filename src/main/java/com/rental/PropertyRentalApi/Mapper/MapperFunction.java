@@ -13,102 +13,69 @@ import java.util.Set;
 @Mapper(componentModel = "spring")
 public interface MapperFunction {
 
-    // ============================
-    // PROPERTY CREATE
-    // ============================
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "createdBy", ignore = true)
+
+    // ==============
+    // PROPERTY REQUEST MAPPINGS
+    // ==============
     @Mapping(target = "categoryName", ignore = true)
-    @Mapping(target = "images", ignore = true)
-    @Mapping(target = "favorites", ignore = true)
-    @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "deleted", ignore = true)
     Properties toPropertyEntity(PropertyCreateRequest request);
 
-    // ============================
-    // PROPERTY UPDATE
-    // ============================
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "createdBy", ignore = true)
     @Mapping(target = "categoryName", ignore = true)
-    @Mapping(target = "images", ignore = true) // map manually in service
-    @Mapping(target = "favorites", ignore = true)
-    @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "deleted", ignore = true)
     void updatePropertyEntity(
             PropertyUpdateRequest request,
             @MappingTarget Properties entity
     );
 
-    // ============================
-    // PROPERTY RESPONSE
-    // ============================
+    // ==============
+    // PROPERTY RESPONSE MAPPINGS
+    // ==============
     @Mapping(source = "createdBy", target = "createdBy")
-    @Mapping(
-            target = "categoryName",
-            expression = "java(property.getCategoryName().getName())"
-    )
-    @Mapping(source = "images", target = "images")
-    @Mapping(target = "favoriteCount", expression = "java(getFavoriteCount(property.getFavorites()))")
+    @Mapping(source = "categoryName", target = "categoryName")
     PropertyResponse toPropertyResponse(Properties property);
 
-    // ============================
-    // IMAGES
-    // ============================
-    default List<String> mapImages(List<PropertyImages> images) {
-        if (images == null) return List.of();
-        return images.stream().map(PropertyImages::getImageUrl).toList();
-    }
-
-    default List<PropertyImages> mapStringsToImages(List<String> urls, Properties property) {
-        if (urls == null) return List.of();
-        return urls.stream().map(url -> {
-            PropertyImages img = new PropertyImages();
-            img.setImageUrl(url);
-            img.setProperty(property);
-            img.setPrimary(false);
-            return img;
-        }).toList();
-    }
-
-    // ============================
-    // FAVORITES COUNT
-    // ============================
-    default Integer getFavoriteCount(List<Favorites> favorites) {
-        return favorites == null ? 0 : favorites.size();
-    }
-
-    // ============================
-    // USER MAPPING
-    // ============================
+    // ==============
+    // REGISTER REQUEST MAPPINGS
+    // ==============
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "password", ignore = true)
     @Mapping(target = "roles", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
     Users toUserEntity(RegisterRequest request);
 
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "roles", ignore = true)
+
+    // ==============
+    // USER REQUEST MAPPINGS
+    // ==============
     Users toUserEntity(UserCreateRequest request);
 
-    void updateUserEntity(UserUpdateRequest request, @MappingTarget Users entity);
+    void updateUserEntity(
+            UserUpdateRequest request,
+            @MappingTarget Users entity
+    );
 
-    default UserResponse toUserResponse(Users user) {
-        if (user == null) return null;
-        UserResponse response = new UserResponse();
-        response.setId(user.getId());
-        response.setFullname(user.getFullname());
-        response.setUsername(user.getUsername());
-        response.setEmail(user.getEmail());
-        response.setPhone(user.getPhone());
-        response.setRoles(mapRoles(user.getRoles()));
-        return response;
-    }
+    // ==============
+    // USER RESPONSE MAPPINGS
+    // ==============
+    @Mapping(target = "roles", source = "roles")
+    UserResponse toUserResponse(Users user);
 
+    // ==============
+    // ROLES MAPPINGS
+    // ==============
     default List<String> mapRoles(Set<Roles> roles) {
-        if (roles == null || roles.isEmpty()) return List.of();
-        return roles.stream().map(Roles::getName).toList();
+        if (roles == null) {
+            return List.of();
+        }
+        return roles.stream()
+                .map(Roles::getName)
+                .toList();
     }
+
+    // ============================
+    // CATEGORY MAPPING
+    // ============================
+    CategoryResponse toCategoryResponse(Categories category);
 
     // ============================
     // REVIEW MAPPING

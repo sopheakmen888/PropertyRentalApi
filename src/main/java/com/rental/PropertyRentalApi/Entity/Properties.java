@@ -15,6 +15,7 @@ import java.util.List;
 @Table(name = "properties")
 public class Properties {
 
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -37,38 +38,13 @@ public class Properties {
     @Column(name = "water_cost", precision = 10, scale = 2)
     private BigDecimal waterCost;
 
-    ////////////////////////////////////////////////////
-    // CREATED BY USER
-    ////////////////////////////////////////////////////
-
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "created_by", nullable = false)
     private Users createdBy;
 
-    ////////////////////////////////////////////////////
-    // CATEGORY
-    ////////////////////////////////////////////////////
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_name")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "category", nullable = false)
     private Categories categoryName;
-
-    ////////////////////////////////////////////////////
-    // PROPERTY IMAGES (ONE PROPERTY → MANY IMAGES)
-    ////////////////////////////////////////////////////
-
-    @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PropertyImages> images;
-
-    ////////////////////////////////////////////////////
-    // FAVORITES
-    ////////////////////////////////////////////////////
-
-    @OneToMany(mappedBy = "property")
-    private List<Favorites> favorites;
-
-    ////////////////////////////////////////////////////
-    // TIMESTAMP
-    ////////////////////////////////////////////////////
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -78,10 +54,6 @@ public class Properties {
 
     @Column(nullable = false)
     private boolean deleted;
-
-    ////////////////////////////////////////////////////
-    // AUTO TIMESTAMP
-    ////////////////////////////////////////////////////
 
     @PrePersist
     protected void onCreate() {
