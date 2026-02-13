@@ -6,10 +6,8 @@ import com.rental.PropertyRentalApi.DTO.request.PropertyUpdateRequest;
 import com.rental.PropertyRentalApi.DTO.response.ApiResponse;
 import com.rental.PropertyRentalApi.DTO.response.PaginatedResponse;
 import com.rental.PropertyRentalApi.DTO.response.PropertyResponse;
-import com.rental.PropertyRentalApi.Service.Jwt.JwtService;
 import com.rental.PropertyRentalApi.Service.PropertyService;
 import com.rental.PropertyRentalApi.Utils.AuthUtil;
-import com.rental.PropertyRentalApi.Utils.HelperFunction;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +20,6 @@ import java.util.List;
 public class PropertyController {
 
     private final PropertyService propertyService;
-    private final HelperFunction helperFunction;
     private final AuthUtil authUtil;
 
     // ==============

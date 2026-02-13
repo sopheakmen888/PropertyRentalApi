@@ -24,4 +24,5 @@ public interface PropertyService {
     void addFavorite(Long propertyId, Long userId);
 
     void removeFavorite(Long propertyId, Long userId);
+
 }
