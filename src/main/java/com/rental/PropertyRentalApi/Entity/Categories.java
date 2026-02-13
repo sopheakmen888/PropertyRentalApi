@@ -9,6 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "categories")
+@Builder
 public class Categories {
 
     @Id
@@ -17,7 +18,4 @@ public class Categories {
 
     @Column(nullable = false, unique = true)
     private String name;
-
-    @Column(columnDefinition = "TEXT")
-    private String description;
 }

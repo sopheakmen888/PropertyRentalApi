@@ -11,7 +11,7 @@ public interface PropertyService {
         PaginatedResponse<PropertyResponse> getAll(int page, int size);
 
     PropertyResponse getById(Long id);
-    PropertyResponse create(PropertyCreateRequest request, Long id);
+    PropertyResponse create(PropertyCreateRequest request);
     PropertyResponse update(Long id, PropertyUpdateRequest request);
     void delete(Long id);
 
@@ -20,8 +20,8 @@ public interface PropertyService {
 
     void removeFavorite(Long propertyId, Long userId);
 
-    List<PropertyResponse> getPropertiesByCurrentUser(Long userId);
+    List<PropertyResponse> getPropertiesByCurrentUser();
 
     // ===== Search / Filter =====
-    List<PropertyResponse> searchProperties(Long locationId, Long categoryId, Double minPrice, Double maxPrice);
+//    List<PropertyResponse> searchProperties(String categoryName, Double minPrice, Double maxPrice);
 }

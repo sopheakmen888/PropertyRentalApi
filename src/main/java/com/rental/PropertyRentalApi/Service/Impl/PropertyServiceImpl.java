@@ -4,10 +4,9 @@ import com.rental.PropertyRentalApi.DTO.request.PropertyCreateRequest;
 import com.rental.PropertyRentalApi.DTO.request.PropertyUpdateRequest;
 import com.rental.PropertyRentalApi.DTO.response.PaginatedResponse;
 import com.rental.PropertyRentalApi.DTO.response.PropertyResponse;
-import com.rental.PropertyRentalApi.Entity.Properties;
-import com.rental.PropertyRentalApi.Entity.Users;
+import com.rental.PropertyRentalApi.Entity.*;
 import com.rental.PropertyRentalApi.Mapper.MapperFunction;
-import com.rental.PropertyRentalApi.Repository.PropertyRepository;
+import com.rental.PropertyRentalApi.Repository.*;
 import com.rental.PropertyRentalApi.Service.Jwt.JwtService;
 import com.rental.PropertyRentalApi.Service.PropertyService;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +25,10 @@ import static com.rental.PropertyRentalApi.Exception.ErrorsExceptionFactory.*;
 public class PropertyServiceImpl implements PropertyService {
 
     private final PropertyRepository propertyRepository;
+    private final UserRepository userRepository;
+    private final FavoritesRepository favoritesRepository;
+    private final CategoryRepository categoryRepository;
+    private final PropertyImagesRepository propertyImagesRepository;
     private final JwtService jwtService;
     private final MapperFunction mapperFunction;
 
@@ -98,6 +101,15 @@ public class PropertyServiceImpl implements PropertyService {
         }
 
         // ==============
+        // GET CATEGORY
+        // ==============
+        Categories category = categoryRepository
+                .findByName(request.getCategoryName())
+                .orElseThrow(() ->
+                        notFound("Category not found:" + request.getCategoryName())
+                );
+
+        // ==============
         // MAP REQUEST TO ENTITY
         // ==============
         Properties property = mapperFunction.toPropertyEntity(request);
@@ -106,11 +118,23 @@ public class PropertyServiceImpl implements PropertyService {
         // SET CREATED BY USER
         // ==============
         property.setCreatedBy(currentUser);
+        property.setCategoryName(category);
 
         // ==============
         // SAVE AND RETURN NEW PROPERTY
         // ==============
         Properties savedProperty =  propertyRepository.save(property);
+
+        if (request.getImages() != null) {
+            request.getImages().forEach(url -> {
+                PropertyImages image = new PropertyImages();
+                image.setProperty(savedProperty);
+                image.setImageUrl(url);
+                image.setPrimary(false);
+                propertyImagesRepository.save(image);
+            });
+        }
+
         return mapperFunction.toPropertyResponse(savedProperty);
     }
 
@@ -125,24 +149,40 @@ public class PropertyServiceImpl implements PropertyService {
         Users currentUser = jwtService.getCurrentUser();
 
         // ==============
+        // CHECK IF USER EXIST
+        // ==============
+        if (currentUser == null) {
+            throw unauthorized("Authentication required - no authenticated user found");
+        }
+
+        Categories category = categoryRepository
+                .findByName(request.getCategoryName())
+                .orElseThrow(() ->
+                    notFound("Category not found:" + request.getCategoryName())
+                );
+
+        // ==============
         // FIND PROPERTY TO UPDATE
         // ==============
-        Properties findPropertyAndUpdate = propertyRepository.findById(id)
+        Properties property = propertyRepository.findById(id)
                 .orElseThrow(() -> notFound("Property not found."));
 
         // ==============
         // CHECK PERMISSIONS
         // ==============
-        if (!findPropertyAndUpdate.getCreatedBy().getId().equals(currentUser.getId())) {
+        if (!property.getCreatedBy().getId().equals(currentUser.getId())) {
             throw forbidden("You are not allowed to update this property");
         }
 
         // ==============
         // UPDATE PROPERTY DETAILS
         // ==============
-        mapperFunction.updatePropertyEntity(request, findPropertyAndUpdate);
+        mapperFunction.updatePropertyEntity(request, property);
+        property.setCategoryName(category);
 
-        return mapperFunction.toPropertyResponse(findPropertyAndUpdate);
+        Properties updated = propertyRepository.save(property);
+
+        return mapperFunction.toPropertyResponse(updated);
     }
 
     // ==============
@@ -184,4 +224,58 @@ public class PropertyServiceImpl implements PropertyService {
                 .map(mapperFunction::toPropertyResponse)
                 .toList();
     }
+
+    @Override
+    public void addFavorite(Long propertyId, Long userId) {
+        Properties property = propertyRepository.findById(propertyId)
+                .orElseThrow(() -> new RuntimeException("Property not found"));
+        Users user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        boolean alreadyFavorite = favoritesRepository.existsByPropertyAndUser(property, user);
+        if (alreadyFavorite) return;
+
+        Favorites favorite = new Favorites();
+        favorite.setProperty(property);
+        favorite.setUser(user);
+        favoritesRepository.save(favorite);
+    }
+
+    @Override
+    public void removeFavorite(Long propertyId, Long userId) {
+        Properties property = propertyRepository.findById(propertyId)
+                .orElseThrow(() -> new RuntimeException("Property not found"));
+        Users user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Favorites favorite = favoritesRepository.findByPropertyAndUser(property, user)
+                .orElseThrow(() -> new RuntimeException("Favorite not found"));
+        favoritesRepository.delete(favorite);
+    }
+
+    // ======================
+    // SEARCH / FILTER
+    // ======================
+//    @Override
+//    public List<PropertyResponse> searchProperties(String categoryName, Double minPrice, Double maxPrice) {
+//
+//        List<Properties> properties;
+//
+//        boolean hasCategory = categoryId != null;
+//        boolean hasPrice = minPrice != null && maxPrice != null;
+//
+//        if (hasCategory && hasPrice) {
+//            properties = propertyRepository.findByCategoryIdAndPriceBetween(categoryId, minPrice, maxPrice);
+//        } else if (hasCategory) {
+//            properties = propertyRepository.findByCategoryId(categoryId);
+//        } else if (hasPrice) {
+//            properties = propertyRepository.findByPriceBetween(minPrice, maxPrice);
+//        } else {
+//            properties = propertyRepository.findAll();
+//        }
+//
+//        return properties.stream()
+//                .map(mapperFunction::toPropertyResponse)
+//                .toList();
+//    }
 }

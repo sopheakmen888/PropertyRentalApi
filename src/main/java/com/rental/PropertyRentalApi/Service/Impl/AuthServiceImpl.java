@@ -173,7 +173,7 @@ public class AuthServiceImpl implements AuthService {
         // ========================
         // MAP REQUEST TO ENTITY USING MAPSTRUCT
         // ========================
-Users user = mapperFunction.toUserEntity(request);
+        Users user = mapperFunction.toUserEntity(request);
 
         // Set encoded password (can't be done by MapStruct)
         user.setPassword(passwordEncoder.encode(request.getPassword()));
@@ -206,7 +206,6 @@ Users user = mapperFunction.toUserEntity(request);
         } catch (Exception e) {
             log.warn("Device tracking failed during register for user {}", savedUser.getId(), e);
         }
-
 
         // ========================
         // EXTRACT ROLE NAMES

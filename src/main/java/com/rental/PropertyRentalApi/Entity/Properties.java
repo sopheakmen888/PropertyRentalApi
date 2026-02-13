@@ -46,20 +46,11 @@ public class Properties {
     private Users createdBy;
 
     ////////////////////////////////////////////////////
-    // LOCATION
-    ////////////////////////////////////////////////////
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "location_id", nullable = false)
-    private Locations location;
-
-    ////////////////////////////////////////////////////
     // CATEGORY
     ////////////////////////////////////////////////////
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "category_id", nullable = false)
-    private Categories category;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_name")
+    private Categories categoryName;
 
     ////////////////////////////////////////////////////
     // PROPERTY IMAGES (ONE PROPERTY → MANY IMAGES)

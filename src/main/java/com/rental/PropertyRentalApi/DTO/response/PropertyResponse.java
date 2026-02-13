@@ -15,7 +15,6 @@ public class PropertyResponse {
     private BigDecimal electricityCost;
     private BigDecimal waterCost;
 
-    private String locationName;
     private String categoryName;
     private UserResponse createdBy;
     private List<String> images;

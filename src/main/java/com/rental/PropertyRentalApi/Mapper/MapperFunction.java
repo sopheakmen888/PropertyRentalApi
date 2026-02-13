@@ -18,8 +18,7 @@ public interface MapperFunction {
     // ============================
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdBy", ignore = true)
-    @Mapping(target = "location", ignore = true)
-    @Mapping(target = "category", ignore = true)
+    @Mapping(target = "categoryName", ignore = true)
     @Mapping(target = "images", ignore = true)
     @Mapping(target = "favorites", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
@@ -32,21 +31,25 @@ public interface MapperFunction {
     // ============================
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdBy", ignore = true)
-    @Mapping(target = "location", ignore = true)
-    @Mapping(target = "category", ignore = true)
+    @Mapping(target = "categoryName", ignore = true)
     @Mapping(target = "images", ignore = true) // map manually in service
     @Mapping(target = "favorites", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "deleted", ignore = true)
-    void updatePropertyEntity(PropertyUpdateRequest request, @MappingTarget Properties entity);
+    void updatePropertyEntity(
+            PropertyUpdateRequest request,
+            @MappingTarget Properties entity
+    );
 
     // ============================
     // PROPERTY RESPONSE
     // ============================
     @Mapping(source = "createdBy", target = "createdBy")
-    @Mapping(source = "location.name", target = "locationName")
-    @Mapping(source = "category.name", target = "categoryName")
+    @Mapping(
+            target = "categoryName",
+            expression = "java(property.getCategoryName().getName())"
+    )
     @Mapping(source = "images", target = "images")
     @Mapping(target = "favoriteCount", expression = "java(getFavoriteCount(property.getFavorites()))")
     PropertyResponse toPropertyResponse(Properties property);

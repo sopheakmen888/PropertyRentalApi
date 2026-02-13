@@ -5,6 +5,8 @@ import com.rental.PropertyRentalApi.DTO.request.PropertyUpdateRequest;
 import com.rental.PropertyRentalApi.DTO.response.ApiResponse;
 import com.rental.PropertyRentalApi.DTO.response.PaginatedResponse;
 import com.rental.PropertyRentalApi.DTO.response.PropertyResponse;
+import com.rental.PropertyRentalApi.Entity.Users;
+import com.rental.PropertyRentalApi.Service.Jwt.JwtService;
 import com.rental.PropertyRentalApi.Service.PropertyService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +20,7 @@ import java.util.List;
 public class PropertyController {
 
     private final PropertyService propertyService;
+    private final JwtService jwtService;
 
     // ==============
     // GET ALL WITH PAGINATION
@@ -92,7 +95,7 @@ public class PropertyController {
     // ========================
     // DELETE
     // ========================
-    @DeleteMapping("properties/{id}")
+    @DeleteMapping("/properties/{id}")
     public ApiResponse<Void> deleteProperty(@PathVariable Long id) {
 
         propertyService.delete(id);
@@ -120,4 +123,51 @@ public class PropertyController {
                 properties
         );
     }
+
+    // ============================
+    // ADD FAVORITE
+    // ============================
+    @PostMapping("/properties/{id}/favorite")
+    public ApiResponse<Void> addFavorite(@PathVariable Long id) {
+        Users currentUser = jwtService.getCurrentUser();
+        propertyService.addFavorite(id, currentUser.getId());
+        return new ApiResponse<>(
+                200,
+                true,
+                "Property added to favorites."
+        );
+    }
+
+    // ============================
+    // REMOVE FAVORITE
+    // ============================
+    @DeleteMapping("/properties/{id}/favorite")
+    public ApiResponse<Void> removeFavorite(@PathVariable Long id) {
+        Users currentUser = jwtService.getCurrentUser();
+        propertyService.removeFavorite(id, currentUser.getId());
+        return new ApiResponse<>(
+                200,
+                true,
+                "Property removed from favorites."
+        );
+    }
+
+    // ============================
+    // SEARCH & FILTER PROPERTIES
+    // Example: /api/properties/search?locationId=1&categoryId=2&minPrice=100&maxPrice=200
+    // ============================
+//    @GetMapping("/public/properties/search")
+//    public ApiResponse<List<PropertyResponse>> searchProperties(
+//            @RequestParam(required = false) String categoryName,
+//            @RequestParam(required = false) Double minPrice,
+//            @RequestParam(required = false) Double maxPrice) {
+//
+//        List<PropertyResponse> results = propertyService.searchProperties( categoryName, minPrice, maxPrice);
+//        return new ApiResponse<>(
+//                200,
+//                true,
+//                "Search results retrieved successfully.",
+//                results
+//        );
+//    }
 }

@@ -7,7 +7,7 @@ import com.rental.PropertyRentalApi.Entity.Properties;
 import com.rental.PropertyRentalApi.Entity.Reviews;
 import com.rental.PropertyRentalApi.Entity.Users;
 import com.rental.PropertyRentalApi.Mapper.MapperFunction;
-import com.rental.PropertyRentalApi.Repository.PropertiesRepository;
+import com.rental.PropertyRentalApi.Repository.PropertyRepository;
 import com.rental.PropertyRentalApi.Repository.ReviewRepository;
 import com.rental.PropertyRentalApi.Service.Jwt.JwtService;
 import com.rental.PropertyRentalApi.Service.ReviewService;
@@ -25,7 +25,7 @@ import static com.rental.PropertyRentalApi.Exception.ErrorsExceptionFactory.*;
 public class ReviewServiceImpl implements ReviewService {
 
     private final ReviewRepository reviewRepository;
-    private final PropertiesRepository propertyRepository;
+    private final PropertyRepository propertyRepository;
     private final JwtService jwtService;
     private final MapperFunction mapper;
 
