@@ -10,6 +10,7 @@ import com.rental.PropertyRentalApi.Repository.*;
 import com.rental.PropertyRentalApi.Service.Jwt.JwtService;
 import com.rental.PropertyRentalApi.Service.PropertyService;
 import com.rental.PropertyRentalApi.Utils.HelperFunction;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,12 +24,14 @@ import static com.rental.PropertyRentalApi.Exception.ErrorsExceptionFactory.*;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 @SuppressWarnings("unused")
 public class PropertyServiceImpl implements PropertyService {
 
     private final PropertyRepository propertyRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
+    private final FavoritesRepository favoritesRepository;
     private final JwtService jwtService;
     private final MapperFunction mapperFunction;
     private final HelperFunction helperFunction;
@@ -214,4 +217,33 @@ public class PropertyServiceImpl implements PropertyService {
                 .map(mapperFunction::toPropertyResponse)
                 .toList();
     }
+
+    @Override
+    public void addFavorite(Long propertyId, Long userId) {
+        Properties property = propertyRepository.findById(propertyId)
+                .orElseThrow(() -> new RuntimeException("Property not found"));
+        Users user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        boolean alreadyFavorite = favoritesRepository.existsByPropertyAndUser(property, user);
+        if (alreadyFavorite) return;
+
+        Favorites favorite = new Favorites();
+        favorite.setProperty(property);
+        favorite.setUser(user);
+        favoritesRepository.save(favorite);
+    }
+
+    @Override
+    public void removeFavorite(Long propertyId, Long userId) {
+        Properties property = propertyRepository.findById(propertyId)
+                .orElseThrow(() -> new RuntimeException("Property not found"));
+        Users user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Favorites favorite = favoritesRepository.findByPropertyAndUser(property, user)
+                .orElseThrow(() -> new RuntimeException("Favorite not found"));
+        favoritesRepository.delete(favorite);
+    }
+
 }

@@ -1,10 +1,12 @@
 package com.rental.PropertyRentalApi.Controller;
 
+import com.rental.PropertyRentalApi.Entity.Users;
 import com.rental.PropertyRentalApi.DTO.request.PropertyCreateRequest;
 import com.rental.PropertyRentalApi.DTO.request.PropertyUpdateRequest;
 import com.rental.PropertyRentalApi.DTO.response.ApiResponse;
 import com.rental.PropertyRentalApi.DTO.response.PaginatedResponse;
 import com.rental.PropertyRentalApi.DTO.response.PropertyResponse;
+import com.rental.PropertyRentalApi.Service.Jwt.JwtService;
 import com.rental.PropertyRentalApi.Service.PropertyService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +20,7 @@ import java.util.List;
 public class PropertyController {
 
     private final PropertyService propertyService;
+    private final JwtService jwtService;
 
     // ==============
     // GET ALL WITH PAGINATION
@@ -119,6 +122,37 @@ public class PropertyController {
                 true,
                 "Get your properties successfully.",
                 properties
+        );
+    }
+
+    // ============================
+    // ADD FAVORITE
+    // ============================
+    @PostMapping("/properties/{id}/favorite")
+    public ApiResponse<Void> addFavorite(@PathVariable Long id) {
+        Users currentUser = jwtService.getCurrentUser();
+        propertyService.addFavorite(id, currentUser.getId());
+        List<PropertyResponse> properties =
+                propertyService.getPropertiesByCurrentUser();
+
+        return new ApiResponse<>(
+                200,
+                true,
+                "Property added to favorites."
+        );
+    }
+
+    // ============================
+    // REMOVE FAVORITE
+    // ============================
+    @DeleteMapping("/properties/{id}/favorite")
+    public ApiResponse<Void> removeFavorite(@PathVariable Long id) {
+        Users currentUser = jwtService.getCurrentUser();
+        propertyService.removeFavorite(id, currentUser.getId());
+        return new ApiResponse<>(
+                200,
+                true,
+                "Property removed from favorites."
         );
     }
 }

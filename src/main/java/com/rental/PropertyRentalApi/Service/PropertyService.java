@@ -20,4 +20,8 @@ public interface PropertyService {
     void delete(Long id);
 
     List<PropertyResponse> getPropertiesByCurrentUser();
+
+    void addFavorite(Long propertyId, Long userId);
+
+    void removeFavorite(Long propertyId, Long userId);
 }
