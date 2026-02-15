@@ -9,37 +9,40 @@ import com.rental.PropertyRentalApi.Mapper.MapperFunction;
 import com.rental.PropertyRentalApi.Repository.*;
 import com.rental.PropertyRentalApi.Service.Jwt.JwtService;
 import com.rental.PropertyRentalApi.Service.PropertyService;
+import com.rental.PropertyRentalApi.Utils.HelperFunction;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+//import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-import static com.rental.PropertyRentalApi.Exception.ErrorsExceptionFactory.notFound;
+import static com.rental.PropertyRentalApi.Exception.ErrorsExceptionFactory.*;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
+@SuppressWarnings("unused")
 public class PropertyServiceImpl implements PropertyService {
 
-    private final PropertiesRepository propertiesRepository;
+    private final PropertyRepository propertyRepository;
     private final UserRepository userRepository;
-    private final LocationRepository locationRepository;
     private final CategoryRepository categoryRepository;
-    private final PropertyImagesRepository imagesRepository;
     private final FavoritesRepository favoritesRepository;
-    private final MapperFunction mapperFunction;
     private final JwtService jwtService;
+    private final MapperFunction mapperFunction;
+    private final HelperFunction helperFunction;
+
+    private static final long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 
     // ==============
     // GET ALL WITH PAGINATION
     // ==============
     @Override
     public PaginatedResponse<PropertyResponse> getAll(int page, int size) {
-        // Create pageable object (pages are 0-indexed)
         Pageable pageable = PageRequest.of(
                 page,
                 size
@@ -88,19 +91,20 @@ public class PropertyServiceImpl implements PropertyService {
     // CREATE
     // ==============
     @Override
-    public PropertyResponse create(PropertyCreateRequest request) {
+    public PropertyResponse create(
+            PropertyCreateRequest request
+    ) {
 
         // ==============
         // GET CURRENT USER
         // ==============
-        Users currentUser = jwtService.getCurrentUser();
+        Users currentUser = helperFunction.getAuthenticatedUser();
 
         // ==============
-        // CHECK IF USER EXIST
+        // GET CATEGORY
         // ==============
-        if (currentUser == null) {
-            throw unauthorized("Authentication required - no authenticated user found");
-        }
+        Categories category = helperFunction.getCategoryOrThrow(request.getCategoryName());
+
 
         // ==============
         // MAP REQUEST TO ENTITY
@@ -111,42 +115,12 @@ public class PropertyServiceImpl implements PropertyService {
         // SET CREATED BY USER
         // ==============
         property.setCreatedBy(currentUser);
+        property.setCategory(category);
 
         // ==============
         // SAVE AND RETURN NEW PROPERTY
         // ==============
         Properties savedProperty =  propertyRepository.save(property);
-        return mapperFunction.toPropertyResponse(savedProperty);
-    }
-
-    @Override
-    public PropertyResponse create(PropertyCreateRequest request, Long userId) {
-        Users user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        Locations location = locationRepository.findById(request.getLocationId())
-                .orElseThrow(() -> new RuntimeException("Location not found"));
-
-        Categories category = categoryRepository.findById(request.getCategoryId())
-                .orElseThrow(() -> new RuntimeException("Category not found"));
-
-        Properties property = mapperFunction.toPropertyEntity(request);
-        property.setCreatedBy(user);
-        property.setLocation(location);
-        property.setCategory(category);
-
-        Properties savedProperty = propertiesRepository.save(property);
-
-        // Save images
-        if (request.getImages() != null) {
-            request.getImages().forEach(url -> {
-                PropertyImages image = new PropertyImages();
-                image.setProperty(savedProperty);
-                image.setImageUrl(url);
-                image.setPrimary(false);
-                imagesRepository.save(image);
-            });
-        }
 
         return mapperFunction.toPropertyResponse(savedProperty);
     }
@@ -159,27 +133,36 @@ public class PropertyServiceImpl implements PropertyService {
         // ==============
         // GET CURRENT USER
         // ==============
-        Users currentUser = jwtService.getCurrentUser();
+        Users currentUser = helperFunction.getAuthenticatedUser();
+
+        // ==============
+        // GET CATEGORY
+        // ==============
+        Categories category = helperFunction.getCategoryOrThrow(request.getCategoryName());
 
         // ==============
         // FIND PROPERTY TO UPDATE
         // ==============
-        Properties findPropertyAndUpdate = propertyRepository.findById(id)
+        Properties property = propertyRepository.findById(id)
                 .orElseThrow(() -> notFound("Property not found."));
 
         // ==============
         // CHECK PERMISSIONS
         // ==============
-        if (!findPropertyAndUpdate.getCreatedBy().getId().equals(currentUser.getId())) {
+        if (!property.getCreatedBy().getId().equals(currentUser.getId())) {
             throw forbidden("You are not allowed to update this property");
         }
 
         // ==============
         // UPDATE PROPERTY DETAILS
         // ==============
-        mapperFunction.updatePropertyEntity(request, findPropertyAndUpdate);
+        mapperFunction.updatePropertyEntity(request, property);
 
-        return mapperFunction.toPropertyResponse(findPropertyAndUpdate);
+        property.setCategory(category);
+
+        Properties updated = propertyRepository.save(property);
+
+        return mapperFunction.toPropertyResponse(updated);
     }
 
     // ==============
@@ -187,8 +170,21 @@ public class PropertyServiceImpl implements PropertyService {
     // ==============
     @Override
     public void delete(Long id) {
+
+        Users currentUser = helperFunction.getAuthenticatedUser();
+
         Properties property = propertyRepository.findById(id)
                 .orElseThrow(() -> notFound("Property not found."));
+
+        if (!property.getCreatedBy()
+                .getId()
+                .equals(currentUser.getId())) {
+
+            throw forbidden(
+                    "You are not allowed to delete this property"
+            );
+        }
+
         propertyRepository.delete(property);
     }
 
@@ -200,7 +196,7 @@ public class PropertyServiceImpl implements PropertyService {
         // ==============
         // GET CURRENT USER
         // ==============
-        Users currentUser = jwtService.getCurrentUser();
+        Users currentUser = helperFunction.getAuthenticatedUser();
 
         // ==============
         // GET USER'S PROPERTIES
@@ -224,13 +220,13 @@ public class PropertyServiceImpl implements PropertyService {
 
     @Override
     public void addFavorite(Long propertyId, Long userId) {
-        Properties property = propertiesRepository.findById(propertyId)
+        Properties property = propertyRepository.findById(propertyId)
                 .orElseThrow(() -> new RuntimeException("Property not found"));
         Users user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        boolean alreadyFavorited = favoritesRepository.existsByPropertyAndUser(property, user);
-        if (alreadyFavorited) return;
+        boolean alreadyFavorite = favoritesRepository.existsByPropertyAndUser(property, user);
+        if (alreadyFavorite) return;
 
         Favorites favorite = new Favorites();
         favorite.setProperty(property);
@@ -240,7 +236,7 @@ public class PropertyServiceImpl implements PropertyService {
 
     @Override
     public void removeFavorite(Long propertyId, Long userId) {
-        Properties property = propertiesRepository.findById(propertyId)
+        Properties property = propertyRepository.findById(propertyId)
                 .orElseThrow(() -> new RuntimeException("Property not found"));
         Users user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -250,48 +246,4 @@ public class PropertyServiceImpl implements PropertyService {
         favoritesRepository.delete(favorite);
     }
 
-    @Override
-    public List<PropertyResponse> getPropertiesByCurrentUser(Long userId) {
-        Users user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        return propertiesRepository.findAllByCreatedBy(user).stream()
-                .map(mapper::toPropertyResponse)
-                .toList();
-    }
-
-    // ======================
-    // SEARCH / FILTER
-    // ======================
-    @Override
-    public List<PropertyResponse> searchProperties(Long locationId, Long categoryId, Double minPrice, Double maxPrice) {
-
-        List<Properties> properties;
-
-        boolean hasLocation = locationId != null;
-        boolean hasCategory = categoryId != null;
-        boolean hasPrice = minPrice != null && maxPrice != null;
-
-        if (hasLocation && hasCategory && hasPrice) {
-            properties = propertiesRepository.findByLocationIdAndCategoryIdAndPriceBetween(locationId, categoryId, minPrice, maxPrice);
-        } else if (hasLocation && hasCategory) {
-            properties = propertiesRepository.findByLocationIdAndCategoryId(locationId, categoryId);
-        } else if (hasLocation && hasPrice) {
-            properties = propertiesRepository.findByLocationIdAndPriceBetween(locationId, minPrice, maxPrice);
-        } else if (hasCategory && hasPrice) {
-            properties = propertiesRepository.findByCategoryIdAndPriceBetween(categoryId, minPrice, maxPrice);
-        } else if (hasLocation) {
-            properties = propertiesRepository.findByLocationId(locationId);
-        } else if (hasCategory) {
-            properties = propertiesRepository.findByCategoryId(categoryId);
-        } else if (hasPrice) {
-            properties = propertiesRepository.findByPriceBetween(minPrice, maxPrice);
-        } else {
-            properties = propertiesRepository.findAll();
-        }
-
-        return properties.stream()
-                .map(mapper::toPropertyResponse)
-                .toList();
-    }
 }

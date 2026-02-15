@@ -6,7 +6,6 @@ import jakarta.validation.constraints.Positive;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 @Data
 public class PropertyCreateRequest {
@@ -27,11 +26,8 @@ public class PropertyCreateRequest {
     private BigDecimal electricityCost;
     private BigDecimal waterCost;
 
-    @NotNull(message = "Location ID is required")
-    private Long locationId;
+//    @NotNull(message = "Category Name is required")
+    @NotBlank(message = "Category Name is required")
+    private String categoryName;
 
-    @NotNull(message = "Category ID is required")
-    private Long categoryId;
-
-    private List<String> images; // optional
 }

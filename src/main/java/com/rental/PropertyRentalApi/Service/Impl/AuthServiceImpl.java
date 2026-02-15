@@ -11,19 +11,17 @@ import com.rental.PropertyRentalApi.Repository.RefreshTokenRepository;
 import com.rental.PropertyRentalApi.Repository.RoleRepository;
 import com.rental.PropertyRentalApi.Repository.UserRepository;
 import com.rental.PropertyRentalApi.Service.AuthService;
+import com.rental.PropertyRentalApi.Service.DeviceTrackingService;
 import com.rental.PropertyRentalApi.Service.Jwt.JwtService;
 import com.rental.PropertyRentalApi.Utils.CookieHelper;
 
-
-import static com.rental.PropertyRentalApi.Exception.ErrorsExceptionFactory.notFound;
-import static com.rental.PropertyRentalApi.Exception.ErrorsExceptionFactory.unauthorized;
-import static com.rental.PropertyRentalApi.Exception.ErrorsExceptionFactory.badRequest;
 
 import com.rental.PropertyRentalApi.Utils.HelperFunction;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -34,6 +32,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import static com.rental.PropertyRentalApi.Exception.ErrorsExceptionFactory.*;
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @SuppressWarnings("unused")
@@ -47,6 +48,7 @@ public class AuthServiceImpl implements AuthService {
     private final MapperFunction mapperFunction;
     private final RefreshTokenRepository refreshTokenRepository;
     private final HelperFunction helperFunction;
+    private final DeviceTrackingService deviceTrackingService;
 
     @Override
     public RefreshTokenResponse refreshToken(
@@ -150,6 +152,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public RegisterResponse register(
             RegisterRequest request,
+            HttpServletRequest httpRequest,
             HttpServletResponse response
     ) {
         // Validate username
@@ -168,7 +171,7 @@ public class AuthServiceImpl implements AuthService {
         // ========================
         // MAP REQUEST TO ENTITY USING MAPSTRUCT
         // ========================
-Users user = mapperFunction.toUserEntity(request);
+        Users user = mapperFunction.toUserEntity(request);
 
         // Set encoded password (can't be done by MapStruct)
         user.setPassword(passwordEncoder.encode(request.getPassword()));
@@ -194,15 +197,20 @@ Users user = mapperFunction.toUserEntity(request);
         Users savedUser = userRepository.save(user);
 
         // ============================
-        // Track device login
+        // Track device (AUTO-LOGIN)
         // ============================
-
+        try {
+            deviceTrackingService.trackUserDevice(savedUser, httpRequest);
+        } catch (Exception e) {
+            log.warn("Device tracking failed during register for user {}", savedUser.getId(), e);
+        }
 
         // ========================
         // EXTRACT ROLE NAMES
         // ========================
         // List<String> roles = mapperFunction.mapRolesToStringList(savedUser.getRoles());
         List<String> roles = user.getRoles()
+//        savedUser.getRoles()
                 .stream()
                 .map(Roles::getName)
                 .toList();
@@ -224,7 +232,7 @@ Users user = mapperFunction.toUserEntity(request);
 
         RefreshToken refreshToken = new RefreshToken();
         refreshToken.setToken(refreshTokenValue);
-        refreshToken.setUsers(user);
+        refreshToken.setUsers(savedUser);
         refreshToken.setExpiresAt(
                 Instant.now().plus(30, ChronoUnit.DAYS)
         );
@@ -264,6 +272,7 @@ Users user = mapperFunction.toUserEntity(request);
     @Override
     public AuthResponse login(
             AuthRequest request,
+            HttpServletRequest httpRequest,
             HttpServletResponse response
     ) {
 
@@ -286,6 +295,15 @@ Users user = mapperFunction.toUserEntity(request);
         // MAP USER TO RESPONSE USING MAPSTRUCT
         // ========================
         UserResponse userResponse = mapperFunction.toUserResponse(user);
+
+        // ============================
+        // Track device login
+        // ============================
+        try {
+            deviceTrackingService.trackUserDevice(user, httpRequest);
+        } catch (Exception e) {
+            log.warn("Device tracking failed for user {}", user.getId(), e);
+        }
 
         // ========================
         // GENERATE ACCESS TOKENS

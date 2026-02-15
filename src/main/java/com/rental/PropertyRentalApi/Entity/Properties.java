@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -14,6 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 @Table(name = "properties")
 public class Properties {
+
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,47 +39,16 @@ public class Properties {
     @Column(name = "water_cost", precision = 10, scale = 2)
     private BigDecimal waterCost;
 
-    ////////////////////////////////////////////////////
-    // CREATED BY USER
-    ////////////////////////////////////////////////////
-
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "created_by", nullable = false)
     private Users createdBy;
-
-    ////////////////////////////////////////////////////
-    // LOCATION
-    ////////////////////////////////////////////////////
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "location_id", nullable = false)
-    private Locations location;
-
-    ////////////////////////////////////////////////////
-    // CATEGORY
-    ////////////////////////////////////////////////////
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "category_id", nullable = false)
     private Categories category;
 
-    ////////////////////////////////////////////////////
-    // PROPERTY IMAGES (ONE PROPERTY → MANY IMAGES)
-    ////////////////////////////////////////////////////
-
-    @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PropertyImages> images;
-
-    ////////////////////////////////////////////////////
-    // FAVORITES
-    ////////////////////////////////////////////////////
-
-    @OneToMany(mappedBy = "property")
-    private List<Favorites> favorites;
-
-    ////////////////////////////////////////////////////
-    // TIMESTAMP
-    ////////////////////////////////////////////////////
+//    @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private List<PropertyImage> images = new ArrayList<>();
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -87,10 +58,6 @@ public class Properties {
 
     @Column(nullable = false)
     private boolean deleted;
-
-    ////////////////////////////////////////////////////
-    // AUTO TIMESTAMP
-    ////////////////////////////////////////////////////
 
     @PrePersist
     protected void onCreate() {

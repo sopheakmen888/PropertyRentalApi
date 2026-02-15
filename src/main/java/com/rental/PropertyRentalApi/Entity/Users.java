@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -32,6 +33,9 @@ public class Users implements UserDetails {
     @Column(name = "username", unique = true, nullable = false)
     private String username;
 
+    @Column(name = "date_of_birth")
+    private String dob;
+
     @Column(name = "email", unique = true, nullable = false)
     private String email;
 
@@ -40,6 +44,9 @@ public class Users implements UserDetails {
 
     @Column(name = "phone", unique = true)
     private String phone;
+
+    @Column(name = "profile_photo")
+    private String profilePhoto;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(

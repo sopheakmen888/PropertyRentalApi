@@ -99,4 +99,17 @@ public class UserController {
                 null
         );
     }
+
+    @GetMapping("/me")
+    public ApiResponse<UserResponse> getMyProfile() {
+
+        UserResponse userData = userService.userProfileInfo();
+
+        return new ApiResponse<>(
+                200,
+                true,
+                "Get user info data successfully.",
+                userData
+        );
+    }
 }

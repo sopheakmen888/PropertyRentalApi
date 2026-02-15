@@ -1,10 +1,11 @@
 package com.rental.PropertyRentalApi.Controller;
 
+import com.rental.PropertyRentalApi.Entity.Users;
 import com.rental.PropertyRentalApi.DTO.request.PropertyCreateRequest;
 import com.rental.PropertyRentalApi.DTO.request.PropertyUpdateRequest;
 import com.rental.PropertyRentalApi.DTO.response.ApiResponse;
+import com.rental.PropertyRentalApi.DTO.response.PaginatedResponse;
 import com.rental.PropertyRentalApi.DTO.response.PropertyResponse;
-import com.rental.PropertyRentalApi.Entity.Users;
 import com.rental.PropertyRentalApi.Service.Jwt.JwtService;
 import com.rental.PropertyRentalApi.Service.PropertyService;
 import jakarta.validation.Valid;
@@ -21,103 +22,107 @@ public class PropertyController {
     private final PropertyService propertyService;
     private final JwtService jwtService;
 
-    // -----------------------------
-    // Helper: Check Admin or Agent
-    // -----------------------------
-    private void checkAdminOrAgent(Users user) {
-        boolean allowed = user.getRoles().stream()
-                .anyMatch(role -> role.getName().equalsIgnoreCase("admin") ||
-                                  role.getName().equalsIgnoreCase("agent"));
-        if (!allowed) {
-            throw new RuntimeException("Only Admin or Agent can perform this action.");
-        }
+    // ==============
+    // GET ALL WITH PAGINATION
+    // ==============
+    @GetMapping("/public/properties")
+    public ApiResponse<PaginatedResponse<PropertyResponse>> getAllProperties(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        // Convert page to 0-indexed for service layer
+        PaginatedResponse<PropertyResponse> paginatedProperties =
+                propertyService.getAll(page, size);
+
+        return new ApiResponse<>(
+                200,
+                true,
+                "Get all properties successfully.",
+                paginatedProperties
+        );
     }
 
-    // ============================
-    // CREATE PROPERTY
-    // ============================
+    // ========================
+    // GET BY ID
+    // ========================
+    @GetMapping("/public/properties/{id}")
+    public ApiResponse<PropertyResponse> getPropertyById(@PathVariable Long id) {
+        PropertyResponse property = propertyService.getById(id);
+
+        return new ApiResponse<>(
+                200,
+                true,
+                "Get properties successfully.",
+                property
+        );
+    }
+
+    // ==============
+    // CREATE
+    // ==============
     @PostMapping("/properties")
-    public ApiResponse<PropertyResponse> createProperty(
-            @Valid @RequestBody PropertyCreateRequest request) {
+    public ApiResponse<PropertyResponse> createdProperty(
+            @Valid
+            @RequestBody PropertyCreateRequest request
+    ) {
+        PropertyResponse property = propertyService.create(request);
 
-        Users currentUser = jwtService.getCurrentUser();
-        checkAdminOrAgent(currentUser);
-
-        PropertyResponse property = propertyService.createProperty(request, currentUser.getId());
-
-        return new ApiResponse<>(201, true, "Created Property successfully.", property);
+        return new ApiResponse<>(
+                201,
+                true,
+                "Created Property successfully.",
+                property
+        );
     }
 
-    // ============================
-    // UPDATE PROPERTY
-    // ============================
+    // ========================
+    // UPDATE
+    // ========================
     @PutMapping("/properties/{id}")
     public ApiResponse<PropertyResponse> updateProperty(
             @PathVariable Long id,
-            @Valid @RequestBody PropertyUpdateRequest request) {
+            @Valid @RequestBody PropertyUpdateRequest request
+    ) {
+        PropertyResponse updatedProperty = propertyService.update(id, request);
 
-        Users currentUser = jwtService.getCurrentUser();
-        checkAdminOrAgent(currentUser);
-
-        PropertyResponse updatedProperty = propertyService.updateProperty(id, request);
-
-        return new ApiResponse<>(200, true, "Updated Property successfully.", updatedProperty);
+        return new ApiResponse<>(
+                200,
+                true,
+                "Updated property successfully.",
+                updatedProperty
+        );
     }
 
-    // ============================
-    // DELETE PROPERTY
-    // ============================
+    // ========================
+    // DELETE
+    // ========================
     @DeleteMapping("/properties/{id}")
     public ApiResponse<Void> deleteProperty(@PathVariable Long id) {
-        Users currentUser = jwtService.getCurrentUser();
-        checkAdminOrAgent(currentUser);
 
-        propertyService.deleteProperty(id);
+        propertyService.delete(id);
 
-        return new ApiResponse<>(204, true, "Property deleted successfully.");
+        return new ApiResponse<>(
+                204,
+                true,
+                "Property deleted successfully."
+        );
     }
 
-    // ============================
-    // GET PROPERTY BY ID
-    // ============================
-    @GetMapping("/public/properties/{id}")
-    public ApiResponse<PropertyResponse> getPropertyById(@PathVariable Long id) {
-        PropertyResponse property = propertyService.getPropertyById(id);
-        return new ApiResponse<>(200, true, "Property retrieved successfully.", property);
-    }
-
-    // ============================
-    // GET ALL PROPERTIES
-    // ============================
-    @GetMapping("/public/properties")
-    public ApiResponse<List<PropertyResponse>> getAllProperties() {
-        List<PropertyResponse> properties = propertyService.getAllProperties();
-        return new ApiResponse<>(200, true, "All properties retrieved successfully.", properties);
-    }
-
-    // ============================
-    // SEARCH & FILTER PROPERTIES
-    // Example: /api/properties/search?locationId=1&categoryId=2&minPrice=100&maxPrice=200
-    // ============================
-    @GetMapping("/public/properties/search")
-    public ApiResponse<List<PropertyResponse>> searchProperties(
-            @RequestParam(required = false) Long locationId,
-            @RequestParam(required = false) Long categoryId,
-            @RequestParam(required = false) Double minPrice,
-            @RequestParam(required = false) Double maxPrice) {
-
-        List<PropertyResponse> results = propertyService.searchProperties(locationId, categoryId, minPrice, maxPrice);
-        return new ApiResponse<>(200, true, "Search results retrieved successfully.", results);
-    }
-
-    // ============================
+    // ========================
     // GET CURRENT USER PROPERTIES
-    // ============================
+    // ========================
     @GetMapping("/my-properties")
     public ApiResponse<List<PropertyResponse>> getMyProperties() {
-        Users currentUser = jwtService.getCurrentUser();
-        List<PropertyResponse> properties = propertyService.getPropertiesByCurrentUser(currentUser.getId());
-        return new ApiResponse<>(200, true, "Your properties retrieved successfully.", properties);
+
+        List<PropertyResponse> properties =
+                propertyService.getPropertiesByCurrentUser();
+
+        return new ApiResponse<>(
+                200,
+                true,
+                "Get your properties successfully.",
+                properties
+        );
     }
 
     // ============================
@@ -127,7 +132,14 @@ public class PropertyController {
     public ApiResponse<Void> addFavorite(@PathVariable Long id) {
         Users currentUser = jwtService.getCurrentUser();
         propertyService.addFavorite(id, currentUser.getId());
-        return new ApiResponse<>(200, true, "Property added to favorites.");
+        List<PropertyResponse> properties =
+                propertyService.getPropertiesByCurrentUser();
+
+        return new ApiResponse<>(
+                200,
+                true,
+                "Property added to favorites."
+        );
     }
 
     // ============================
@@ -137,6 +149,10 @@ public class PropertyController {
     public ApiResponse<Void> removeFavorite(@PathVariable Long id) {
         Users currentUser = jwtService.getCurrentUser();
         propertyService.removeFavorite(id, currentUser.getId());
-        return new ApiResponse<>(200, true, "Property removed from favorites.");
+        return new ApiResponse<>(
+                200,
+                true,
+                "Property removed from favorites."
+        );
     }
 }
