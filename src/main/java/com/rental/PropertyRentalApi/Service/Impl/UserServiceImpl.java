@@ -99,4 +99,12 @@ public class UserServiceImpl implements UserService {
 
         userRepository.delete(user);
     }
+
+    @Override
+    public UserResponse userProfileInfo() {
+
+        Users currentUserData = helperFunction.getAuthenticatedUser();
+
+        return mapperFunction.toUserResponse(currentUserData);
+    }
 }

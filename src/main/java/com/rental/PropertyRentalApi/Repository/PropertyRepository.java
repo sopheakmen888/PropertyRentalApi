@@ -14,13 +14,4 @@ public interface PropertyRepository extends JpaRepository<Properties, Long> {
 
     // Find properties created by a specific user
     List<Properties> findAllByCreatedBy(Users user);
-
-//    // Find properties by category
-//    List<Properties> findByCategoryId(Long categoryId);
-//
-//    // Find properties by price range
-//    List<Properties> findByPriceBetween(Double minPrice, Double maxPrice);
-//
-//    // Find properties by category and price range
-//    List<Properties> findByCategoryIdAndPriceBetween(Long categoryId, Double minPrice, Double maxPrice);
 }

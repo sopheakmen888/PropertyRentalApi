@@ -80,21 +80,23 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                                 .requestMatchers("/api/public/**").permitAll()
                                 .requestMatchers("/api/reviews/**").permitAll()
+//                                .requestMatchers("/uploads/**").permitAll()
 
                         // ============================
                         // ROLE BASE AUTHORIZATION
                         // ============================
 //                        .requestMatchers("/api/users/**").hasRole("admin")
+                                .requestMatchers("/api/users/me").authenticated()
                                 .requestMatchers("/api/users/**").hasRole("admin")
-                        .requestMatchers("/api/properties/**").hasAnyRole("admin", "agent")
+                        .requestMatchers("/api/properties/**").hasAnyRole("admin, agent")
 
                 // DEV: allow all endpoints
-                                .anyRequest().permitAll()
+//                                .anyRequest().permitAll()
 
                 // ============================
                 // PROD (UNCOMMENT)
                 // ============================
-//                         .anyRequest().authenticated()
+                         .anyRequest().authenticated()
                 )
 
                 // ============================

@@ -1,9 +1,8 @@
 package com.rental.PropertyRentalApi.DTO.response;
 
-import com.rental.PropertyRentalApi.Entity.Categories;
 import lombok.Data;
 import java.math.BigDecimal;
-import java.util.List;
+//import java.util.ArrayList;
 
 @Data
 public class PropertyResponse {
@@ -16,6 +15,7 @@ public class PropertyResponse {
     private BigDecimal electricityCost;
     private BigDecimal waterCost;
 
-    private CategoryResponse categoryName;
+    private CategoryResponse category;
     private UserResponse createdBy;
+//    private ArrayList<String> images;
 }

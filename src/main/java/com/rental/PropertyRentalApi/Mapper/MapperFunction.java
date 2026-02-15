@@ -17,10 +17,10 @@ public interface MapperFunction {
     // ==============
     // PROPERTY REQUEST MAPPINGS
     // ==============
-    @Mapping(target = "categoryName", ignore = true)
+    @Mapping(target = "category", ignore = true)
     Properties toPropertyEntity(PropertyCreateRequest request);
 
-    @Mapping(target = "categoryName", ignore = true)
+    @Mapping(target = "category", ignore = true)
     void updatePropertyEntity(
             PropertyUpdateRequest request,
             @MappingTarget Properties entity
@@ -29,8 +29,9 @@ public interface MapperFunction {
     // ==============
     // PROPERTY RESPONSE MAPPINGS
     // ==============
-    @Mapping(source = "createdBy", target = "createdBy")
-    @Mapping(source = "categoryName", target = "categoryName")
+//    @Mapping(source = "createdBy", target = "createdBy")
+    @Mapping(source = "category", target = "category")
+//    @Mapping(source = "images", target = "images")
     PropertyResponse toPropertyResponse(Properties property);
 
     // ==============
@@ -41,6 +42,7 @@ public interface MapperFunction {
     @Mapping(target = "roles", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
+//    @Mapping(target = "profilePhoto", ignore = true)
     Users toUserEntity(RegisterRequest request);
 
 

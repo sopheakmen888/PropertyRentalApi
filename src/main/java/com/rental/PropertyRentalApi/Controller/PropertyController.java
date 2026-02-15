@@ -5,7 +5,6 @@ import com.rental.PropertyRentalApi.DTO.request.PropertyUpdateRequest;
 import com.rental.PropertyRentalApi.DTO.response.ApiResponse;
 import com.rental.PropertyRentalApi.DTO.response.PaginatedResponse;
 import com.rental.PropertyRentalApi.DTO.response.PropertyResponse;
-import com.rental.PropertyRentalApi.Service.Jwt.JwtService;
 import com.rental.PropertyRentalApi.Service.PropertyService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -61,7 +60,8 @@ public class PropertyController {
     @PostMapping("/properties")
     public ApiResponse<PropertyResponse> createdProperty(
             @Valid
-            @RequestBody PropertyCreateRequest request) {
+            @RequestBody PropertyCreateRequest request
+    ) {
         PropertyResponse property = propertyService.create(request);
 
         return new ApiResponse<>(

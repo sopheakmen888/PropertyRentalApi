@@ -16,10 +16,6 @@ import com.rental.PropertyRentalApi.Service.Jwt.JwtService;
 import com.rental.PropertyRentalApi.Utils.CookieHelper;
 
 
-import static com.rental.PropertyRentalApi.Exception.ErrorsExceptionFactory.notFound;
-import static com.rental.PropertyRentalApi.Exception.ErrorsExceptionFactory.unauthorized;
-import static com.rental.PropertyRentalApi.Exception.ErrorsExceptionFactory.badRequest;
-
 import com.rental.PropertyRentalApi.Utils.HelperFunction;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -35,6 +31,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+
+import static com.rental.PropertyRentalApi.Exception.ErrorsExceptionFactory.*;
 
 @Slf4j
 @Service

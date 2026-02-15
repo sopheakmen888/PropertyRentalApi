@@ -9,11 +9,13 @@ import com.rental.PropertyRentalApi.Mapper.MapperFunction;
 import com.rental.PropertyRentalApi.Repository.*;
 import com.rental.PropertyRentalApi.Service.Jwt.JwtService;
 import com.rental.PropertyRentalApi.Service.PropertyService;
+import com.rental.PropertyRentalApi.Utils.HelperFunction;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+//import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -29,6 +31,9 @@ public class PropertyServiceImpl implements PropertyService {
     private final CategoryRepository categoryRepository;
     private final JwtService jwtService;
     private final MapperFunction mapperFunction;
+    private final HelperFunction helperFunction;
+
+    private static final long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 
     // ==============
     // GET ALL WITH PAGINATION
@@ -83,28 +88,19 @@ public class PropertyServiceImpl implements PropertyService {
     // CREATE
     // ==============
     @Override
-    public PropertyResponse create(PropertyCreateRequest request) {
+    public PropertyResponse create(
+            PropertyCreateRequest request
+    ) {
 
         // ==============
         // GET CURRENT USER
         // ==============
-        Users currentUser = jwtService.getCurrentUser();
-
-        // ==============
-        // CHECK IF USER EXIST
-        // ==============
-        if (currentUser == null) {
-            throw unauthorized("Authentication required - no authenticated user found");
-        }
+        Users currentUser = helperFunction.getAuthenticatedUser();
 
         // ==============
         // GET CATEGORY
         // ==============
-        Categories category =
-                categoryRepository.findByName(request.getCategoryName())
-                .orElseThrow(() ->
-                        notFound("Category not found.")
-                );
+        Categories category = helperFunction.getCategoryOrThrow(request.getCategoryName());
 
 
         // ==============
@@ -116,7 +112,7 @@ public class PropertyServiceImpl implements PropertyService {
         // SET CREATED BY USER
         // ==============
         property.setCreatedBy(currentUser);
-        property.setCategoryName(category);
+        property.setCategory(category);
 
         // ==============
         // SAVE AND RETURN NEW PROPERTY
@@ -134,23 +130,12 @@ public class PropertyServiceImpl implements PropertyService {
         // ==============
         // GET CURRENT USER
         // ==============
-        Users currentUser = jwtService.getCurrentUser();
-
-        // ==============
-        // CHECK IF USER EXIST
-        // ==============
-        if (currentUser == null) {
-            throw unauthorized("Authentication required - no authenticated user found");
-        }
+        Users currentUser = helperFunction.getAuthenticatedUser();
 
         // ==============
         // GET CATEGORY
         // ==============
-        Categories category =
-                categoryRepository.findByName(request.getCategoryName())
-                        .orElseThrow(() ->
-                                notFound("Category not found.")
-                        );
+        Categories category = helperFunction.getCategoryOrThrow(request.getCategoryName());
 
         // ==============
         // FIND PROPERTY TO UPDATE
@@ -170,7 +155,7 @@ public class PropertyServiceImpl implements PropertyService {
         // ==============
         mapperFunction.updatePropertyEntity(request, property);
 
-        property.setCategoryName(category);
+        property.setCategory(category);
 
         Properties updated = propertyRepository.save(property);
 
@@ -182,8 +167,21 @@ public class PropertyServiceImpl implements PropertyService {
     // ==============
     @Override
     public void delete(Long id) {
+
+        Users currentUser = helperFunction.getAuthenticatedUser();
+
         Properties property = propertyRepository.findById(id)
                 .orElseThrow(() -> notFound("Property not found."));
+
+        if (!property.getCreatedBy()
+                .getId()
+                .equals(currentUser.getId())) {
+
+            throw forbidden(
+                    "You are not allowed to delete this property"
+            );
+        }
+
         propertyRepository.delete(property);
     }
 
@@ -195,7 +193,7 @@ public class PropertyServiceImpl implements PropertyService {
         // ==============
         // GET CURRENT USER
         // ==============
-        Users currentUser = jwtService.getCurrentUser();
+        Users currentUser = helperFunction.getAuthenticatedUser();
 
         // ==============
         // GET USER'S PROPERTIES

@@ -29,4 +29,5 @@ public class PropertyCreateRequest {
 //    @NotNull(message = "Category Name is required")
     @NotBlank(message = "Category Name is required")
     private String categoryName;
+
 }

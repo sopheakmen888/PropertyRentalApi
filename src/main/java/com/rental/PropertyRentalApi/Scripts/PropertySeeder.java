@@ -19,7 +19,7 @@ import static com.rental.PropertyRentalApi.Exception.ErrorsExceptionFactory.notF
 @Slf4j
 @Component
 @RequiredArgsConstructor
-@Order(3)
+@Order(4)
 public class PropertySeeder implements CommandLineRunner {
 
     private final PropertyRepository propertyRepository;
@@ -81,7 +81,7 @@ public class PropertySeeder implements CommandLineRunner {
         }
 
         Categories category = categoryRepository.findByName(categoryName)
-                .orElseThrow(() -> new RuntimeException("Category '" + categoryName + "' not found. Seed categories first."));
+                .orElseThrow(() -> notFound("Category '" + categoryName + "' not found. Seed categories first."));
 
         Properties property = new Properties();
         property.setTitle(title);
@@ -93,7 +93,7 @@ public class PropertySeeder implements CommandLineRunner {
 
         // 🔗 VERY IMPORTANT
         property.setCreatedBy(owner);
-        property.setCategoryName(category);
+        property.setCategory(category);
 
         propertyRepository.save(property);
         log.info("Seeded property '{}'", title);

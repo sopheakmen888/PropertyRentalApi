@@ -2,6 +2,8 @@ package com.rental.PropertyRentalApi.Exception;
 
 import org.springframework.http.HttpStatus;
 
+import java.io.IOException;
+
 // ======= ERROR FACTORY ======= //
 public final class ErrorsExceptionFactory {
 
@@ -30,7 +32,7 @@ public final class ErrorsExceptionFactory {
         return new ApiException(422, message != null ? message : "Validation failed.");
     }
 
-    public static ApiException internal(String message) {
+    public static ApiException internal(String message, IOException e) {
         return new ApiException(500, message != null ? message : "Internal server error.");
     }
 }

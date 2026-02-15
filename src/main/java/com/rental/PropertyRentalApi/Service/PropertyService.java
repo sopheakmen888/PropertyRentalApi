@@ -11,7 +11,11 @@ public interface PropertyService {
         PaginatedResponse<PropertyResponse> getAll(int page, int size);
 
     PropertyResponse getById(Long id);
-    PropertyResponse create(PropertyCreateRequest request);
+
+    PropertyResponse create(
+            PropertyCreateRequest request
+    );
+
     PropertyResponse update(Long id, PropertyUpdateRequest request);
     void delete(Long id);
 

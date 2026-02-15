@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-@Order(4)
+@Order(3)
 public class CategorySeeder implements CommandLineRunner {
 
     private final CategoryRepository categoryRepository;

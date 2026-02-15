@@ -3,13 +3,11 @@ package com.rental.PropertyRentalApi.Service;
 
 import com.rental.PropertyRentalApi.DTO.request.AuthRequest;
 import com.rental.PropertyRentalApi.DTO.request.RegisterRequest;
-import com.rental.PropertyRentalApi.DTO.response.ApiResponse;
-import com.rental.PropertyRentalApi.DTO.response.AuthResponse;
-import com.rental.PropertyRentalApi.DTO.response.RefreshTokenResponse;
-import com.rental.PropertyRentalApi.DTO.response.RegisterResponse;
+//import com.rental.PropertyRentalApi.DTO.request.UpdateProfilePhotoRequest;
+import com.rental.PropertyRentalApi.DTO.response.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
+//import org.springframework.web.multipart.MultipartFile;
 
 
 public interface AuthService {
@@ -19,11 +17,14 @@ public interface AuthService {
             HttpServletResponse response
     );
 
+//    UserResponse updateProfilePhoto(Long userId, UpdateProfilePhotoRequest request);
+
     RegisterResponse register(
             RegisterRequest request,
             HttpServletRequest httpRequest,
             HttpServletResponse response
     );
+
     AuthResponse login(
             AuthRequest request,
             HttpServletRequest httpRequest,
