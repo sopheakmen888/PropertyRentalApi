@@ -178,7 +178,8 @@ public class PropertyServiceImpl implements PropertyService {
 
         if (!property.getCreatedBy()
                 .getId()
-                .equals(currentUser.getId())) {
+                .equals(currentUser.getId())
+        ) {
 
             throw forbidden(
                     "You are not allowed to delete this property"
@@ -222,6 +223,7 @@ public class PropertyServiceImpl implements PropertyService {
     public void addFavorite(Long propertyId, Long userId) {
         Properties property = propertyRepository.findById(propertyId)
                 .orElseThrow(() -> new RuntimeException("Property not found"));
+
         Users user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -238,6 +240,7 @@ public class PropertyServiceImpl implements PropertyService {
     public void removeFavorite(Long propertyId, Long userId) {
         Properties property = propertyRepository.findById(propertyId)
                 .orElseThrow(() -> new RuntimeException("Property not found"));
+
         Users user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
