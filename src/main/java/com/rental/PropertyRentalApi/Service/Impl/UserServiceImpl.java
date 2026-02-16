@@ -62,6 +62,7 @@ public class UserServiceImpl implements UserService {
         Users user = userRepository.findById(id)
                 .orElseThrow(() -> notFound("User not found"));
 
+
         return mapperFunction.toUserResponse(user);
     }
 
@@ -83,6 +84,8 @@ public class UserServiceImpl implements UserService {
 
         Users user = userRepository.findById(id)
                 .orElseThrow(() -> notFound("User not found"));
+//        Users user = userRepository.findByIdWithFavorite(id)
+//                .orElseThrow(() -> notFound("User not found"));
 
         mapperFunction.updateUserEntity(request, user);
 
@@ -103,7 +106,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponse userProfileInfo() {
 
-        Users currentUserData = helperFunction.getAuthenticatedUser();
+        Users authUser = helperFunction.getAuthenticatedUser();
+
+        Users currentUserData = userRepository
+                .findById(authUser.getId())
+                .orElseThrow(() -> notFound("User not found."));
 
         return mapperFunction.toUserResponse(currentUserData);
     }

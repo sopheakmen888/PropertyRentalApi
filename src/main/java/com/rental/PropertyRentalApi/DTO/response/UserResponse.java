@@ -17,7 +17,7 @@ public class UserResponse {
     private String email;
     private String phone;
 //    private String profilePhoto;
-//    private String favorites;
+    private List<PropertyResponse> favorites;
     private List<String> roles;
 }
 

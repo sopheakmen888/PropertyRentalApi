@@ -202,7 +202,8 @@ public class PropertyServiceImpl implements PropertyService {
         // ==============
         // GET USER'S PROPERTIES
         // ==============
-        List<Properties> propertiesByCurrentUser = propertyRepository.findAllByCreatedBy(currentUser);
+        List<Properties> propertiesByCurrentUser =
+                propertyRepository.findAllByCreatedBy(currentUser);
 
         // ==============
         // CHECK IF USER HAS PROPERTIES

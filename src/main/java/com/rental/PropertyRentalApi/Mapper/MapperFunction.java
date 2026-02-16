@@ -60,6 +60,7 @@ public interface MapperFunction {
     // USER RESPONSE MAPPINGS
     // ==============
     @Mapping(target = "roles", source = "roles")
+    @Mapping(target = "favorites", expression = "java(mapFavorites(user.getFavorites()))")
     UserResponse toUserResponse(Users user);
 
     // ==============
@@ -73,6 +74,27 @@ public interface MapperFunction {
                 .map(Roles::getName)
                 .toList();
     }
+
+    // ============================
+    // FAVORITES MAPPING
+    // ============================
+
+    default PropertyResponse map(Favorites favorite) {
+        if (favorite == null || favorite.getProperty() == null) {
+            return null;
+        }
+        return toPropertyResponse(favorite.getProperty());
+    }
+
+    default List<PropertyResponse> mapFavorites(List<Favorites> favorites) {
+        if (favorites == null) {
+            return List.of();
+        }
+        return favorites.stream()
+                .map(this::map)
+                .toList();
+    }
+
 
     // ============================
     // CATEGORY MAPPING

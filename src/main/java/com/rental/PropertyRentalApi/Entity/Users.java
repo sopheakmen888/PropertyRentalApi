@@ -7,10 +7,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -45,14 +42,11 @@ public class Users implements UserDetails {
     @Column(name = "phone", unique = true)
     private String phone;
 
-    @Column(name = "profile_photo")
-    private String profilePhoto;
+//    @Column(name = "profile_photo")
+//    private String profilePhoto;
 
-    // ==================
-    // Note: here
-    // ==================
-    @Column(name = "favorites")
-    private String favorites;
+    @OneToMany(mappedBy = "user")
+    private List<Favorites> favorites;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
