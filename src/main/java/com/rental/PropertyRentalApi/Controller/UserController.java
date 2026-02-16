@@ -9,8 +9,6 @@ import com.rental.PropertyRentalApi.Service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/users")
@@ -22,33 +20,19 @@ public class UserController {
     // GET ALL USERS WITH PAGINATION
     // ==============
     @GetMapping
-    public ApiResponse<PaginatedResponse<UserResponse>> getAllUsers(
-            @RequestParam(defaultValue = "1") int page,
+    public ApiResponse<?> getAllUsers(
+            @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        PaginatedResponse<UserResponse> paginatedUsers =
-                userService.getAll(page -1, size);
-
+        PaginatedResponse<UserResponse> paginatedUsers = userService.getAll(page, size);
         return new ApiResponse<>(
                 200,
-                "Get all users successfully.",
+                true,
+                "Get users successfully.",
                 paginatedUsers
         );
     }
 
-    // =====================
-    // GET ALL USERS
-    // =====================
-//    @GetMapping
-//    public ApiResponse<List<UserResponse>> getAllUsers() {
-//        List<UserResponse> getAllUser = userService.getAll();
-//
-//        return new ApiResponse<>(
-//                200,
-//                "Get users successfully.",
-//                getAllUser
-//        );
-//    }
 
     // =====================
     // GET USER BY ID
@@ -59,6 +43,7 @@ public class UserController {
 
         return new ApiResponse<>(
                 200,
+                true,
                 "Get user successfully.",
                 getUserId
         );
@@ -75,6 +60,7 @@ public class UserController {
 
         return new ApiResponse<>(
                 201,
+                true,
                 "User created successfully.",
                 createdUser
         );
@@ -92,6 +78,7 @@ public class UserController {
 
         return new ApiResponse<>(
                 200,
+                true,
                 "User updated successfully.",
                 updatedUser
         );
@@ -107,8 +94,22 @@ public class UserController {
 
         return new ApiResponse<>(
                 200,
+                true,
                 "User deleted successfully.",
                 null
+        );
+    }
+
+    @GetMapping("/me")
+    public ApiResponse<UserResponse> getMyProfile() {
+
+        UserResponse userData = userService.userProfileInfo();
+
+        return new ApiResponse<>(
+                200,
+                true,
+                "Get user info data successfully.",
+                userData
         );
     }
 }

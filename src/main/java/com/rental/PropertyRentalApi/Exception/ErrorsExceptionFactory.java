@@ -1,5 +1,9 @@
 package com.rental.PropertyRentalApi.Exception;
 
+import org.springframework.http.HttpStatus;
+
+import java.io.IOException;
+
 // ======= ERROR FACTORY ======= //
 public final class ErrorsExceptionFactory {
 
@@ -10,7 +14,10 @@ public final class ErrorsExceptionFactory {
     }
 
     public static ApiException notFound(String message) {
-        return new ApiException(404, message != null ? message : "Data not found.");
+        return new ApiException(
+            HttpStatus.NOT_FOUND.value(),
+            message != null ? message : "Data not found."
+        );
     }
 
     public static ApiException unauthorized(String message) {
@@ -25,7 +32,7 @@ public final class ErrorsExceptionFactory {
         return new ApiException(422, message != null ? message : "Validation failed.");
     }
 
-    public static ApiException internal(String message) {
+    public static ApiException internal(String message, IOException e) {
         return new ApiException(500, message != null ? message : "Internal server error.");
     }
 }

@@ -4,17 +4,19 @@ import com.rental.PropertyRentalApi.DTO.request.PropertyCreateRequest;
 import com.rental.PropertyRentalApi.DTO.request.PropertyUpdateRequest;
 import com.rental.PropertyRentalApi.DTO.response.PaginatedResponse;
 import com.rental.PropertyRentalApi.DTO.response.PropertyResponse;
-import com.rental.PropertyRentalApi.Entity.PropertyEntity;
-import com.rental.PropertyRentalApi.Entity.UserEntity;
+import com.rental.PropertyRentalApi.Entity.*;
 import com.rental.PropertyRentalApi.Mapper.MapperFunction;
-import com.rental.PropertyRentalApi.Repository.PropertyRepository;
+import com.rental.PropertyRentalApi.Repository.*;
 import com.rental.PropertyRentalApi.Service.Jwt.JwtService;
 import com.rental.PropertyRentalApi.Service.PropertyService;
+import com.rental.PropertyRentalApi.Utils.HelperFunction;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+//import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -22,25 +24,32 @@ import static com.rental.PropertyRentalApi.Exception.ErrorsExceptionFactory.*;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
+@SuppressWarnings("unused")
 public class PropertyServiceImpl implements PropertyService {
 
     private final PropertyRepository propertyRepository;
+    private final UserRepository userRepository;
+    private final CategoryRepository categoryRepository;
+    private final FavoritesRepository favoritesRepository;
     private final JwtService jwtService;
     private final MapperFunction mapperFunction;
+    private final HelperFunction helperFunction;
+
+    private static final long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 
     // ==============
     // GET ALL WITH PAGINATION
     // ==============
     @Override
     public PaginatedResponse<PropertyResponse> getAll(int page, int size) {
-        // Create pageable object (pages are 0-indexed)
         Pageable pageable = PageRequest.of(
                 page,
                 size
         );
 
         // Fetch paginated data
-        Page<PropertyEntity> propertyPage = propertyRepository.findAll(pageable);
+        Page<Properties> propertyPage = propertyRepository.findAll(pageable);
 
         // Check if page is empty
         if (propertyPage.isEmpty()) {
@@ -67,28 +76,12 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
     // ==============
-    // GET ALL
-    // ==============
-//    @Override
-//    public List<PropertyResponse> getAll() {
-//
-//        List<PropertyEntity> properties = propertyRepository.findAll();
-//        if (properties.isEmpty()) {
-//            throw notFound("Properties not found.");
-//        }
-//
-//        return properties.stream()
-//                .map(mapperFunction::toPropertyResponse)
-//                .toList();
-//    }
-
-    // ==============
     // GET BY ID
     // ==============
     @Override
     public PropertyResponse getById(Long id) {
 
-        PropertyEntity property = propertyRepository.findById(id)
+        Properties property = propertyRepository.findById(id)
                 .orElseThrow(() -> notFound("Property not found."));
 
         return mapperFunction.toPropertyResponse(property);
@@ -98,34 +91,37 @@ public class PropertyServiceImpl implements PropertyService {
     // CREATE
     // ==============
     @Override
-    public PropertyResponse create(PropertyCreateRequest request) {
+    public PropertyResponse create(
+            PropertyCreateRequest request
+    ) {
 
         // ==============
         // GET CURRENT USER
         // ==============
-        UserEntity currentUser = jwtService.getCurrentUser();
+        Users currentUser = helperFunction.getAuthenticatedUser();
 
         // ==============
-        // CHECK IF USER EXIST
+        // GET CATEGORY
         // ==============
-        if (currentUser == null) {
-            throw unauthorized("Authentication required - no authenticated user found");
-        }
+        Categories category = helperFunction.getCategoryOrThrow(request.getCategoryName());
+
 
         // ==============
         // MAP REQUEST TO ENTITY
         // ==============
-        PropertyEntity property = mapperFunction.toPropertyEntity(request);
+        Properties property = mapperFunction.toPropertyEntity(request);
 
         // ==============
         // SET CREATED BY USER
         // ==============
         property.setCreatedBy(currentUser);
+        property.setCategory(category);
 
         // ==============
         // SAVE AND RETURN NEW PROPERTY
         // ==============
-        PropertyEntity savedProperty =  propertyRepository.save(property);
+        Properties savedProperty =  propertyRepository.save(property);
+
         return mapperFunction.toPropertyResponse(savedProperty);
     }
 
@@ -137,27 +133,36 @@ public class PropertyServiceImpl implements PropertyService {
         // ==============
         // GET CURRENT USER
         // ==============
-        UserEntity currentUser = jwtService.getCurrentUser();
+        Users currentUser = helperFunction.getAuthenticatedUser();
+
+        // ==============
+        // GET CATEGORY
+        // ==============
+        Categories category = helperFunction.getCategoryOrThrow(request.getCategoryName());
 
         // ==============
         // FIND PROPERTY TO UPDATE
         // ==============
-        PropertyEntity findPropertyAndUpdate = propertyRepository.findById(id)
+        Properties property = propertyRepository.findById(id)
                 .orElseThrow(() -> notFound("Property not found."));
 
         // ==============
         // CHECK PERMISSIONS
         // ==============
-        if (!findPropertyAndUpdate.getCreatedBy().getId().equals(currentUser.getId())) {
+        if (!property.getCreatedBy().getId().equals(currentUser.getId())) {
             throw forbidden("You are not allowed to update this property");
         }
 
         // ==============
         // UPDATE PROPERTY DETAILS
         // ==============
-        mapperFunction.updatePropertyEntity(request, findPropertyAndUpdate);
+        mapperFunction.updatePropertyEntity(request, property);
 
-        return mapperFunction.toPropertyResponse(findPropertyAndUpdate);
+        property.setCategory(category);
+
+        Properties updated = propertyRepository.save(property);
+
+        return mapperFunction.toPropertyResponse(updated);
     }
 
     // ==============
@@ -165,8 +170,22 @@ public class PropertyServiceImpl implements PropertyService {
     // ==============
     @Override
     public void delete(Long id) {
-        PropertyEntity property = propertyRepository.findById(id)
+
+        Users currentUser = helperFunction.getAuthenticatedUser();
+
+        Properties property = propertyRepository.findById(id)
                 .orElseThrow(() -> notFound("Property not found."));
+
+        if (!property.getCreatedBy()
+                .getId()
+                .equals(currentUser.getId())
+        ) {
+
+            throw forbidden(
+                    "You are not allowed to delete this property"
+            );
+        }
+
         propertyRepository.delete(property);
     }
 
@@ -178,12 +197,13 @@ public class PropertyServiceImpl implements PropertyService {
         // ==============
         // GET CURRENT USER
         // ==============
-        UserEntity currentUser = jwtService.getCurrentUser();
+        Users currentUser = helperFunction.getAuthenticatedUser();
 
         // ==============
         // GET USER'S PROPERTIES
         // ==============
-        List<PropertyEntity> propertiesByCurrentUser = propertyRepository.findAllByCreatedBy(currentUser);
+        List<Properties> propertiesByCurrentUser =
+                propertyRepository.findAllByCreatedBy(currentUser);
 
         // ==============
         // CHECK IF USER HAS PROPERTIES
@@ -199,4 +219,35 @@ public class PropertyServiceImpl implements PropertyService {
                 .map(mapperFunction::toPropertyResponse)
                 .toList();
     }
+
+    @Override
+    public void addFavorite(Long propertyId, Long userId) {
+        Properties property = propertyRepository.findById(propertyId)
+                .orElseThrow(() -> new RuntimeException("Property not found"));
+
+        Users user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        boolean alreadyFavorite = favoritesRepository.existsByPropertyAndUser(property, user);
+        if (alreadyFavorite) return;
+
+        Favorites favorite = new Favorites();
+        favorite.setProperty(property);
+        favorite.setUser(user);
+        favoritesRepository.save(favorite);
+    }
+
+    @Override
+    public void removeFavorite(Long propertyId, Long userId) {
+        Properties property = propertyRepository.findById(propertyId)
+                .orElseThrow(() -> new RuntimeException("Property not found"));
+
+        Users user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Favorites favorite = favoritesRepository.findByPropertyAndUser(property, user)
+                .orElseThrow(() -> new RuntimeException("Favorite not found"));
+        favoritesRepository.delete(favorite);
+    }
+
 }

@@ -7,10 +7,9 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
+
 
 @Entity
 @Table(name = "users")
@@ -19,7 +18,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserEntity implements UserDetails {
+public class Users implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,6 +30,9 @@ public class UserEntity implements UserDetails {
     @Column(name = "username", unique = true, nullable = false)
     private String username;
 
+    @Column(name = "date_of_birth")
+    private String dob;
+
     @Column(name = "email", unique = true, nullable = false)
     private String email;
 
@@ -39,6 +41,12 @@ public class UserEntity implements UserDetails {
 
     @Column(name = "phone", unique = true)
     private String phone;
+
+//    @Column(name = "profile_photo")
+//    private String profilePhoto;
+
+    @OneToMany(mappedBy = "user")
+    private List<Favorites> favorites;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
@@ -49,12 +57,12 @@ public class UserEntity implements UserDetails {
     @Builder.Default
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    private Set<RoleEntity> roles = new HashSet<>();
+    private Set<Roles> roles = new HashSet<>();
 
     @OneToMany(mappedBy = "createdBy", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    private Set<PropertyEntity> properties = new HashSet<>();
+    private Set<Properties> properties = new HashSet<>();
 
     @Column(nullable = false)
     private boolean enabled = true;
@@ -71,39 +79,14 @@ public class UserEntity implements UserDetails {
         updatedAt = LocalDateTime.now();
     }
 
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
-    }
 
     // =========================
     // UserDetails Implementation
     // =========================
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles.stream()
-                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName()))
+                .map(r -> new SimpleGrantedAuthority("ROLE_" + r.getName()))
                 .collect(Collectors.toSet());
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return enabled;
     }
 }

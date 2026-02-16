@@ -1,11 +1,14 @@
 package com.rental.PropertyRentalApi.Controller;
 
+import com.rental.PropertyRentalApi.Entity.Users;
 import com.rental.PropertyRentalApi.DTO.request.PropertyCreateRequest;
 import com.rental.PropertyRentalApi.DTO.request.PropertyUpdateRequest;
 import com.rental.PropertyRentalApi.DTO.response.ApiResponse;
 import com.rental.PropertyRentalApi.DTO.response.PaginatedResponse;
 import com.rental.PropertyRentalApi.DTO.response.PropertyResponse;
+import com.rental.PropertyRentalApi.Service.Jwt.JwtService;
 import com.rental.PropertyRentalApi.Service.PropertyService;
+import com.rental.PropertyRentalApi.Utils.HelperFunction;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -14,53 +17,42 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/properties")
+@RequestMapping("/api")
 public class PropertyController {
 
     private final PropertyService propertyService;
+    private final HelperFunction helperFunction;
 
     // ==============
     // GET ALL WITH PAGINATION
     // ==============
-    @GetMapping
+    @GetMapping("/public/properties")
     public ApiResponse<PaginatedResponse<PropertyResponse>> getAllProperties(
-            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
         // Convert page to 0-indexed for service layer
         PaginatedResponse<PropertyResponse> paginatedProperties =
-                propertyService.getAll(page - 1, size);
+                propertyService.getAll(page, size);
 
         return new ApiResponse<>(
                 200,
+                true,
                 "Get all properties successfully.",
                 paginatedProperties
         );
     }
 
     // ========================
-    // GET ALL
-    // ========================
-//    @GetMapping
-//    public ApiResponse<List<PropertyResponse>> getAllProperties() {
-//        List<PropertyResponse> properties = propertyService.getAll();
-//
-//        return new ApiResponse<>(
-//                200,
-//                "Get all properties successfully.",
-//                properties
-//        );
-//    }
-
-    // ========================
     // GET BY ID
     // ========================
-    @GetMapping("/{id}")
-    public ApiResponse<PropertyResponse> getPropertById(@PathVariable Long id) {
+    @GetMapping("/public/properties/{id}")
+    public ApiResponse<PropertyResponse> getPropertyById(@PathVariable Long id) {
         PropertyResponse property = propertyService.getById(id);
 
         return new ApiResponse<>(
                 200,
+                true,
                 "Get properties successfully.",
                 property
         );
@@ -69,14 +61,16 @@ public class PropertyController {
     // ==============
     // CREATE
     // ==============
-    @PostMapping
+    @PostMapping("/properties")
     public ApiResponse<PropertyResponse> createdProperty(
             @Valid
-            @RequestBody PropertyCreateRequest request) {
+            @RequestBody PropertyCreateRequest request
+    ) {
         PropertyResponse property = propertyService.create(request);
 
         return new ApiResponse<>(
                 201,
+                true,
                 "Created Property successfully.",
                 property
         );
@@ -85,7 +79,7 @@ public class PropertyController {
     // ========================
     // UPDATE
     // ========================
-    @PutMapping("/{id}")
+    @PutMapping("/properties/{id}")
     public ApiResponse<PropertyResponse> updateProperty(
             @PathVariable Long id,
             @Valid @RequestBody PropertyUpdateRequest request
@@ -94,6 +88,7 @@ public class PropertyController {
 
         return new ApiResponse<>(
                 200,
+                true,
                 "Updated property successfully.",
                 updatedProperty
         );
@@ -102,13 +97,14 @@ public class PropertyController {
     // ========================
     // DELETE
     // ========================
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/properties/{id}")
     public ApiResponse<Void> deleteProperty(@PathVariable Long id) {
 
         propertyService.delete(id);
 
         return new ApiResponse<>(
                 204,
+                true,
                 "Property deleted successfully."
         );
     }
@@ -124,8 +120,42 @@ public class PropertyController {
 
         return new ApiResponse<>(
                 200,
+                true,
                 "Get your properties successfully.",
                 properties
+        );
+    }
+
+    // ============================
+    // ADD FAVORITE
+    // ============================
+    @PostMapping("/properties/favorite/{id}")
+    public ApiResponse<Void> addFavorite(@PathVariable Long id) {
+
+        Users currentUser = helperFunction.getAuthenticatedUser();
+
+        propertyService.addFavorite(id, currentUser.getId());
+
+        return new ApiResponse<>(
+                200,
+                true,
+                "Property added to favorites."
+        );
+    }
+
+    // ============================
+    // REMOVE FAVORITE
+    // ============================
+    @DeleteMapping("/properties/{id}/favorite")
+    public ApiResponse<Void> removeFavorite(@PathVariable Long id) {
+        Users currentUser = helperFunction.getAuthenticatedUser()
+                ;
+        propertyService.removeFavorite(id, currentUser.getId());
+
+        return new ApiResponse<>(
+                200,
+                true,
+                "Property removed from favorites."
         );
     }
 }

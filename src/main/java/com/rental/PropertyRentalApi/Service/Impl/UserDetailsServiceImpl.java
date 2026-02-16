@@ -1,6 +1,5 @@
 package com.rental.PropertyRentalApi.Service.Impl;
 
-import com.rental.PropertyRentalApi.Entity.UserEntity;
 import com.rental.PropertyRentalApi.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -8,47 +7,28 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
+@SuppressWarnings("unused")
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final UserRepository userRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        // fetch user from database
-        UserEntity user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+    public UserDetails loadUserByUsername(String value)
+            throws UsernameNotFoundException {
 
-        // return user — UserEntity implements UserDetails
-        return user;
+        return userRepository.findByEmail(value)
+                .or(() -> userRepository.findByUsername(value))
+                .or(() -> {
+                    if (value.matches("\\d+")) {
+                        return userRepository.findById(Long.valueOf(value));
+                    }
+                    return Optional.empty();
+                })
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
-}
 
-//package com.rental.PropertyRentalApi.Service.Impl;
-//
-//import com.rental.PropertyRentalApi.Repository.UserRepository;
-//import lombok.RequiredArgsConstructor;
-//
-//import org.springframework.security.core.userdetails.UserDetails;
-//import org.springframework.security.core.userdetails.UserDetailsService;
-//import org.springframework.stereotype.Service;
-//
-//import static com.rental.PropertyRentalApi.Exception.ErrorsExceptionFactory.*;
-//
-//@Service
-//@RequiredArgsConstructor
-//public class UserDetailsServiceImpl implements UserDetailsService {
-//
-//    private final UserRepository userRepository;
-//
-//    @Override
-//    public UserDetails loadUserByUsername(String username) {
-//        if (username == null || username.isBlank()) {
-//            throw badRequest("Username is required.");
-//        }
-//
-//        return userRepository.findByUsername(username)
-//                .orElseThrow(() -> notFound("User not found."));
-//    }
-//}
+}
