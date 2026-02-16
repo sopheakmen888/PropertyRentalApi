@@ -1,6 +1,6 @@
 package com.rental.PropertyRentalApi.Scripts;
 
-import com.rental.PropertyRentalApi.Entity.RoleEntity;
+import com.rental.PropertyRentalApi.Entity.Roles;
 import com.rental.PropertyRentalApi.Repository.RoleRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 @Order(1)
+@SuppressWarnings("unused")
 public class RoleSeeder implements CommandLineRunner {
 
     private final RoleRepository roleRepository;
@@ -34,7 +35,7 @@ public class RoleSeeder implements CommandLineRunner {
         }
 
         roleRepository.save(
-                RoleEntity.builder()
+                Roles.builder()
                         .name(roleName)
                         .build()
         );

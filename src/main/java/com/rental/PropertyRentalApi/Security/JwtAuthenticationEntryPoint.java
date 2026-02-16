@@ -23,7 +23,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         response.setContentType("application/json");
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
-        ApiResponse<String> body = new ApiResponse<>(401, "Authentication token is missing or invalid", null);
+        ApiResponse<String> body = new ApiResponse<>(401, false, "Authentication token is missing or invalid", null);
         response.getWriter().write(objectMapper.writeValueAsString(body));
     }
 }

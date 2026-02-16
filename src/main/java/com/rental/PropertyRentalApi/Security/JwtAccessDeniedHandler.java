@@ -23,7 +23,7 @@ public class JwtAccessDeniedHandler implements AccessDeniedHandler {
         response.setContentType("application/json");
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
 
-        ApiResponse<String> body = new ApiResponse<>(403, "You do not have permission to access this resource", null);
+        ApiResponse<String> body = new ApiResponse<>(403, false, "You do not have permission to access this resource", null);
         response.getWriter().write(objectMapper.writeValueAsString(body));
     }
 }

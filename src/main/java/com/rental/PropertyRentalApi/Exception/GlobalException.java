@@ -18,10 +18,12 @@ public class GlobalException {
     // =========================================
     @ExceptionHandler(ApiException.class)
     public ResponseEntity<ApiResponse<String>> handleApiException(ApiException ex) {
+
         return ResponseEntity
-                .status(ex.getStatusCode())
+                .status(ex.getStatus())
                 .body(new ApiResponse<>(
-                        ex.getStatusCode(),
+                        ex.getStatus(),
+                        false,
                         ex.getMessage(),
                         null
                 ));
@@ -46,6 +48,7 @@ public class GlobalException {
                 .status(HttpStatus.BAD_REQUEST)
                 .body(new ApiResponse<>(
                         400,
+                        false,
                         message,
                         null
                 ));
@@ -66,6 +69,7 @@ public class GlobalException {
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new ApiResponse<>(
                         500,
+                        false,
                         "Internal server error",
                         null
                 ));

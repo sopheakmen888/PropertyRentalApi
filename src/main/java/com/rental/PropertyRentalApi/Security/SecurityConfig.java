@@ -17,6 +17,7 @@ import org.springframework.web.cors.CorsConfiguration;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
+@SuppressWarnings("unused")
 public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
@@ -62,9 +63,9 @@ public class SecurityConfig {
                     config.addExposedHeader("*");
 
                     // PROD: restrict headers
-                    // config.addAllowedHeader("Authorization");
-                    // config.addAllowedHeader("Content-Type");
-                    // config.addExposedHeader("Authorization");
+//                     config.addAllowedHeader("Authorization");
+//                     config.addAllowedHeader("Content-Type");
+//                     config.addExposedHeader("Authorization");
 
                     // Allow cookies / Authorization header
                     config.setAllowCredentials(true);
@@ -77,7 +78,21 @@ public class SecurityConfig {
                 // ============================
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/users/**").hasRole("admin")
+                                .requestMatchers("/api/public/**").permitAll()
+                                .requestMatchers("/api/reviews/**").authenticated()
+//                                .requestMatchers("/uploads/**").permitAll()
+
+                                // ============================
+                                // AUTHENTICATED ENDPOINT
+                                // ============================
+                                .requestMatchers("/api/users/me").authenticated()
+                                .requestMatchers("/api/properties/favorite/**").authenticated()
+
+                        // ============================
+                        // ROLE BASE AUTHORIZATION
+                        // ============================
+//                        .requestMatchers("/api/users/**").hasRole("admin")
+                                .requestMatchers("/api/users/**").hasRole("admin")
                         .requestMatchers("/api/properties/**").hasAnyRole("admin", "agent")
 
                 // DEV: allow all endpoints

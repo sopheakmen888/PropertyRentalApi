@@ -10,7 +10,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PaginatedResponse<T> {
-    private List<T> data;
+    private List<T> items;
     private PaginationMeta pagination;
 
     @Data

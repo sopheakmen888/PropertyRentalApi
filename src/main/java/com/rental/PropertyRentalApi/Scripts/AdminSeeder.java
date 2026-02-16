@@ -1,7 +1,7 @@
 package com.rental.PropertyRentalApi.Scripts;
 
-import com.rental.PropertyRentalApi.Entity.RoleEntity;
-import com.rental.PropertyRentalApi.Entity.UserEntity;
+import com.rental.PropertyRentalApi.Entity.Roles;
+import com.rental.PropertyRentalApi.Entity.Users;
 import com.rental.PropertyRentalApi.Repository.RoleRepository;
 import com.rental.PropertyRentalApi.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +19,7 @@ import static com.rental.PropertyRentalApi.Exception.ErrorsExceptionFactory.notF
 @Component
 @RequiredArgsConstructor
 @Order(2)
+@SuppressWarnings("unused")
 public class AdminSeeder implements CommandLineRunner {
 
     private final UserRepository userRepository;
@@ -43,13 +44,13 @@ public class AdminSeeder implements CommandLineRunner {
             return;
         }
 
-        RoleEntity adminRole = roleRepository.findByName("admin")
+        Roles adminRole = roleRepository.findByName("admin")
                 .orElseThrow(() -> {
                     log.info("Failed to seed admin!");
                     return notFound("Role admin not found.");
                 });
 
-        UserEntity admin = UserEntity.builder()
+        Users admin = Users.builder()
                 .fullname("Admin user")
                 .username("admin")
                 .email(adminEmail)
