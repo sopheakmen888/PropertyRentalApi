@@ -8,6 +8,7 @@ import com.rental.PropertyRentalApi.DTO.response.PaginatedResponse;
 import com.rental.PropertyRentalApi.DTO.response.PropertyResponse;
 import com.rental.PropertyRentalApi.Service.Jwt.JwtService;
 import com.rental.PropertyRentalApi.Service.PropertyService;
+import com.rental.PropertyRentalApi.Utils.HelperFunction;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +21,7 @@ import java.util.List;
 public class PropertyController {
 
     private final PropertyService propertyService;
-    private final JwtService jwtService;
+    private final HelperFunction helperFunction;
 
     // ==============
     // GET ALL WITH PAGINATION
@@ -128,12 +129,12 @@ public class PropertyController {
     // ============================
     // ADD FAVORITE
     // ============================
-    @PostMapping("/properties/{id}/favorite")
+    @PostMapping("/properties/favorite/{id}")
     public ApiResponse<Void> addFavorite(@PathVariable Long id) {
-        Users currentUser = jwtService.getCurrentUser();
+
+        Users currentUser = helperFunction.getAuthenticatedUser();
+
         propertyService.addFavorite(id, currentUser.getId());
-        List<PropertyResponse> properties =
-                propertyService.getPropertiesByCurrentUser();
 
         return new ApiResponse<>(
                 200,
@@ -147,8 +148,10 @@ public class PropertyController {
     // ============================
     @DeleteMapping("/properties/{id}/favorite")
     public ApiResponse<Void> removeFavorite(@PathVariable Long id) {
-        Users currentUser = jwtService.getCurrentUser();
+        Users currentUser = helperFunction.getAuthenticatedUser()
+                ;
         propertyService.removeFavorite(id, currentUser.getId());
+
         return new ApiResponse<>(
                 200,
                 true,

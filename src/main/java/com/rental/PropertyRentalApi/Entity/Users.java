@@ -48,6 +48,12 @@ public class Users implements UserDetails {
     @Column(name = "profile_photo")
     private String profilePhoto;
 
+    // ==================
+    // Note: here
+    // ==================
+    @Column(name = "favorites")
+    private String favorites;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_roles",
