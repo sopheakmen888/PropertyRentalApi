@@ -79,12 +79,12 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
                                 .requestMatchers("/api/public/**").permitAll()
-                                .requestMatchers("/api/reviews/**").authenticated()
-//                                .requestMatchers("/uploads/**").permitAll()
+                                .requestMatchers("/api/uploads/**").permitAll()
 
                                 // ============================
                                 // AUTHENTICATED ENDPOINT
                                 // ============================
+                                .requestMatchers("/api/reviews/**").authenticated()
                                 .requestMatchers("/api/users/me").authenticated()
                                 .requestMatchers("/api/properties/favorite/**").authenticated()
 

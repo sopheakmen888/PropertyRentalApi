@@ -47,8 +47,8 @@ public class Properties {
     @JoinColumn(name = "category_id", nullable = false)
     private Categories category;
 
-//    @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<PropertyImage> images = new ArrayList<>();
+    @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UploadsImages> images;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
