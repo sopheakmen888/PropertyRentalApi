@@ -249,5 +249,4 @@ public class PropertyServiceImpl implements PropertyService {
                 .orElseThrow(() -> new RuntimeException("Favorite not found"));
         favoritesRepository.delete(favorite);
     }
-
 }
