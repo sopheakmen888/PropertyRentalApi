@@ -2,7 +2,7 @@ package com.rental.PropertyRentalApi.DTO.response;
 
 import lombok.Data;
 import java.math.BigDecimal;
-//import java.util.ArrayList;
+import java.util.List;
 
 @Data
 public class PropertyResponse {
@@ -17,5 +17,5 @@ public class PropertyResponse {
 
     private CategoryResponse category;
     private UserResponse createdBy;
-//    private ArrayList<String> images;
+    private List<String> images;
 }

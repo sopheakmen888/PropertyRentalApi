@@ -18,6 +18,7 @@ public class UploadsImagesController {
             @PathVariable Long propertyId,
             @RequestParam("file") MultipartFile file
     ) {
-        return ResponseEntity.ok(uploadService.uploadImage(propertyId, file));
+        String imageUrl = uploadService.uploadImage(propertyId, file);
+        return ResponseEntity.ok(imageUrl);
     }
 }

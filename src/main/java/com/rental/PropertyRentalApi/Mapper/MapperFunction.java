@@ -31,8 +31,19 @@ public interface MapperFunction {
     // ==============
 //    @Mapping(source = "createdBy", target = "createdBy")
     @Mapping(source = "category", target = "category")
-//    @Mapping(source = "images", target = "images")
+    @Mapping(target = "images", expression = "java(mapImages(property.getImages()))")
     PropertyResponse toPropertyResponse(Properties property);
+
+    default List<String> mapImages(List<UploadsImages> images) {
+        if (images == null) {
+            return List.of();
+        }
+
+        return images.stream()
+                .map(image -> "/uploads/" + image.getUrls())
+                .toList();
+    }
+
 
     // ==============
     // REGISTER REQUEST MAPPINGS

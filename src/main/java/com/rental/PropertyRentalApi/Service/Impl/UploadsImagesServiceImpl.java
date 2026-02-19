@@ -15,9 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-
-import static com.rental.PropertyRentalApi.Exception.ErrorsExceptionFactory.internal;
-import static com.rental.PropertyRentalApi.Exception.ErrorsExceptionFactory.notFound;
+import static com.rental.PropertyRentalApi.Exception.ErrorsExceptionFactory.*;
 
 @Service
 @RequiredArgsConstructor
@@ -27,11 +25,16 @@ public class UploadsImagesServiceImpl implements UploadService {
     private final PropertyRepository propertyRepository;
 
     private final String UPLOAD_DIR = "uploads/";
+    private static final long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 
     @Override
     public String uploadImage(Long propertyId, MultipartFile file) {
 
         try {
+
+            if (file.getSize() > 5 * 1024 * 1024) {
+                throw badRequest("File size exceeds 5MB");
+            }
 
             Properties properties = propertyRepository.findById(propertyId)
                     .orElseThrow(() -> notFound("Property not found."));
@@ -46,12 +49,13 @@ public class UploadsImagesServiceImpl implements UploadService {
             Files.write(filePath, file.getBytes());
 
             UploadsImages image = new UploadsImages();
-            image.setUrls(filePath.toString());
+            image.setUrls(fileName);
             image.setProperty(properties);
 
             uploadsImagesRepository.save(image);
 
-            return "Image uploaded successfully";
+//            return "Image uploaded successfully";
+            return "/uploads/" + fileName;
 
         } catch (IOException e) {
             throw internal("Failed to upload image", e);
