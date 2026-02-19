@@ -16,7 +16,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-//import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -35,8 +34,6 @@ public class PropertyServiceImpl implements PropertyService {
     private final JwtService jwtService;
     private final MapperFunction mapperFunction;
     private final HelperFunction helperFunction;
-
-    private static final long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 
     // ==============
     // GET ALL WITH PAGINATION
