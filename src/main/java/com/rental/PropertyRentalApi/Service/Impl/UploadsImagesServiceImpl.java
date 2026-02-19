@@ -32,7 +32,7 @@ public class UploadsImagesServiceImpl implements UploadService {
 
         try {
 
-            if (file.getSize() > 5 * 1024 * 1024) {
+            if (file.getSize() > MAX_FILE_SIZE) {
                 throw badRequest("File size exceeds 5MB");
             }
 
