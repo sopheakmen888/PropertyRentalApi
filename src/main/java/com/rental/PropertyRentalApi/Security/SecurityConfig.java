@@ -44,6 +44,9 @@ public class SecurityConfig {
                     config.addAllowedOrigin("http://localhost:3000");
                     config.addAllowedOrigin("http://localhost:5173");
 
+                    // FOR TESTING IN STAGING
+                    config.addAllowedOrigin("http://127.0.0.1:5500");
+
                     // ============================
                     // PROD ORIGINS (UNCOMMENT)
                     // ============================
