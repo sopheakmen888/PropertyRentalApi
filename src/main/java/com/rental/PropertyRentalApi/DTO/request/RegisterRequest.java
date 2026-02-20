@@ -9,7 +9,7 @@ import java.util.List;
 public class RegisterRequest {
     private String fullname;
     private String username;
-    private String dob;
+//    private String dob;
     private String email;
     private String password;
     private String phone;

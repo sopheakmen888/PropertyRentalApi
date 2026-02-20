@@ -22,4 +22,7 @@ public class UploadsImages {
     @ManyToOne
     @JoinColumn(name = "property_id", nullable = false)
     private Properties property;
+
+    @Column(name = "public_id")
+    private String publicId;
 }

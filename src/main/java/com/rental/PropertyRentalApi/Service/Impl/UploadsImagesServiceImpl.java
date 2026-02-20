@@ -4,16 +4,16 @@ import com.rental.PropertyRentalApi.Entity.Properties;
 import com.rental.PropertyRentalApi.Entity.UploadsImages;
 import com.rental.PropertyRentalApi.Repository.PropertyRepository;
 import com.rental.PropertyRentalApi.Repository.UploadsImagesRepository;
+import com.rental.PropertyRentalApi.Service.CloudinaryService;
 import com.rental.PropertyRentalApi.Service.UploadService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import static com.rental.PropertyRentalApi.Exception.ErrorsExceptionFactory.*;
 
@@ -23,42 +23,76 @@ public class UploadsImagesServiceImpl implements UploadService {
 
     private final UploadsImagesRepository uploadsImagesRepository;
     private final PropertyRepository propertyRepository;
+    private final CloudinaryService cloudinaryService;
 
-    private final String UPLOAD_DIR = "uploads/";
     private static final long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 
     @Override
-    public String uploadImage(Long propertyId, MultipartFile file) {
+    public List<String> uploadImages(Long propertyId, List<MultipartFile> files) {
 
-        try {
+        if (files == null || files.isEmpty()) {
+            throw badRequest("No files provided.");
+        }
+
+        Properties properties = propertyRepository.findById(propertyId)
+                .orElseThrow(() -> notFound("Property not found."));
+
+        List<String> imageUrls = new ArrayList<>();
+
+        for (MultipartFile file : files) {
 
             if (file.getSize() > MAX_FILE_SIZE) {
-                throw badRequest("File size exceeds 5MB");
+                throw badRequest("One of the files exceeds 5MB limit.");
             }
 
-            Properties properties = propertyRepository.findById(propertyId)
-                    .orElseThrow(() -> notFound("Property not found."));
+            try {
 
-            File uploadUrl = new File(UPLOAD_DIR);
-            if (!uploadUrl.exists()) {
-                uploadUrl.mkdir();
+                Map uploadResult = cloudinaryService.upload(file);
+
+                String imageUrl = uploadResult.get("secure_url").toString();
+                String publicId = uploadResult.get("public_id").toString();
+
+                String contentType = file.getContentType();
+
+                if (contentType == null ||
+                        (!contentType.equals("image/jpeg") &&
+                                !contentType.equals("image/png") &&
+                                !contentType.equals("image/webp"))) {
+
+                    throw badRequest("Only JPG, PNG, WEBP images are allowed.");
+                }
+
+                UploadsImages image = new UploadsImages();
+                image.setUrls(imageUrl);
+                image.setPublicId(publicId);
+                image.setProperty(properties);
+
+                uploadsImagesRepository.save(image);
+
+                imageUrls.add(imageUrl);
+
+            } catch (IOException e) {
+                throw internal("Failed to upload image", e);
             }
+        }
 
-            String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-            Path filePath = Paths.get(UPLOAD_DIR + fileName);
-            Files.write(filePath, file.getBytes());
+        return imageUrls;
+    }
 
-            UploadsImages image = new UploadsImages();
-            image.setUrls(fileName);
-            image.setProperty(properties);
+    @Override
+    public void deleteImage(Long imageId) {
+        UploadsImages image = uploadsImagesRepository.findById(imageId)
+                .orElseThrow(() -> notFound("Image not found."));
 
-            uploadsImagesRepository.save(image);
+        try {
+            // Delete from Cloudinary first
+            cloudinaryService.delete(image.getPublicId());
 
-//            return "Image uploaded successfully";
-            return "/uploads/" + fileName;
+            // Then delete from database
+            uploadsImagesRepository.delete(image);
 
         } catch (IOException e) {
-            throw internal("Failed to upload image", e);
+            throw internal("Failed to delete image", e);
         }
     }
 }

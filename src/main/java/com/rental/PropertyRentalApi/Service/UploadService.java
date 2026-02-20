@@ -2,7 +2,11 @@ package com.rental.PropertyRentalApi.Service;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 public interface UploadService {
 
-    String uploadImage(Long propertyId, MultipartFile file);
+    List<String> uploadImages(Long propertyId, List<MultipartFile> files);
+
+    void deleteImage(Long imageId);
 }

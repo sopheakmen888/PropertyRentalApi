@@ -34,6 +34,9 @@ public interface MapperFunction {
     @Mapping(target = "images", expression = "java(mapImages(property.getImages()))")
     PropertyResponse toPropertyResponse(Properties property);
 
+    // ==============
+    // IMAGE MAPPING
+    // ==============
     default List<String> mapImages(List<UploadsImages> images) {
         if (images == null) {
             return List.of();

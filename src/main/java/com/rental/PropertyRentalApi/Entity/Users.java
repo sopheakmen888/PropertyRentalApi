@@ -30,8 +30,8 @@ public class Users implements UserDetails {
     @Column(name = "username", unique = true, nullable = false)
     private String username;
 
-    @Column(name = "date_of_birth")
-    private String dob;
+//    @Column(name = "date_of_birth")
+//    private String dob;
 
     @Column(name = "email", unique = true, nullable = false)
     private String email;

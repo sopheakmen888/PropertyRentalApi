@@ -6,6 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/uploads")
 @RequiredArgsConstructor
@@ -14,11 +16,17 @@ public class UploadsImagesController {
     private final UploadService uploadService;
 
     @PostMapping("/{propertyId}")
-    public ResponseEntity<?> uploadimage(
+    public ResponseEntity<?> uploadImages(
             @PathVariable Long propertyId,
-            @RequestParam("file") MultipartFile file
+            @RequestParam("files") List<MultipartFile> files
     ) {
-        String imageUrl = uploadService.uploadImage(propertyId, file);
-        return ResponseEntity.ok(imageUrl);
+        List<String> imageUrls = uploadService.uploadImages(propertyId, files);
+        return ResponseEntity.ok(imageUrls);
+    }
+
+    @DeleteMapping("/{imageId}")
+    public ResponseEntity<?> deleteImage(@PathVariable Long imageId) {
+        uploadService.deleteImage(imageId);
+        return ResponseEntity.ok("Image deleted successfully.");
     }
 }
