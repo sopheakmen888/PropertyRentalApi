@@ -42,8 +42,10 @@ public class Users implements UserDetails {
     @Column(name = "phone", unique = true)
     private String phone;
 
-//    @Column(name = "profile_photo")
-//    private String profilePhoto;
+//    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private UploadsImages profileImage;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<UploadsImages> images;
 
     @OneToMany(mappedBy = "user")
     private List<Favorites> favorites;

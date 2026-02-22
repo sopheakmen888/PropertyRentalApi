@@ -17,10 +17,10 @@ public class CloudinaryServiceImpl implements CloudinaryService {
     private final Cloudinary cloudinary;
 
     @Override
-    public Map upload(MultipartFile file) throws IOException {
+    public Map upload(MultipartFile file, String folder) throws IOException {
         return cloudinary.uploader().upload(
                 file.getBytes(),
-                ObjectUtils.asMap("folder", "properties")
+                ObjectUtils.asMap("folder", folder)
         );
     }
 

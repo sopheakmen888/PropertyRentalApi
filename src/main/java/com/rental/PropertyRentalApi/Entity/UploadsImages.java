@@ -1,5 +1,6 @@
 package com.rental.PropertyRentalApi.Entity;
 
+import com.rental.PropertyRentalApi.Enum.OwnerType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,10 +20,17 @@ public class UploadsImages {
     @Column(name = "urls")
     private String urls;
 
-    @ManyToOne
-    @JoinColumn(name = "property_id", nullable = false)
-    private Properties property;
-
     @Column(name = "public_id")
     private String publicId;
+
+    @Enumerated(EnumType.STRING)
+    private OwnerType ownerType;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "property_id")
+    private Properties property;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", unique = true)
+    private Users user;
 }

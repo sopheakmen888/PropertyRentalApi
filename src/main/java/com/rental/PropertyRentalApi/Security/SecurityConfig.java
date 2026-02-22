@@ -46,6 +46,7 @@ public class SecurityConfig {
 
                     // FOR TESTING IN STAGING
                     config.addAllowedOrigin("http://127.0.0.1:5500");
+                    config.addAllowedOrigin("http://127.0.0.1:3000");
 
                     // ============================
                     // PROD ORIGINS (UNCOMMENT)
@@ -82,7 +83,6 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
                                 .requestMatchers("/api/public/**").permitAll()
-                                .requestMatchers("/uploads/**").permitAll()
                                 .requestMatchers("/api/uploads/**").permitAll()
 
                                 // ============================
@@ -90,6 +90,7 @@ public class SecurityConfig {
                                 // ============================
                                 .requestMatchers("/api/reviews/**").authenticated()
                                 .requestMatchers("/api/users/me").authenticated()
+                                .requestMatchers("/api/users/profile/**").authenticated()
                                 .requestMatchers("/api/properties/favorite/**").authenticated()
 
                         // ============================

@@ -6,7 +6,9 @@ import java.util.List;
 
 public interface UploadService {
 
-    List<String> uploadImages(Long propertyId, List<MultipartFile> files);
+    List<String> uploadPropertyImages(Long propertyId, List<MultipartFile> files);
+
+    String uploadUserProfile(Long userId, MultipartFile file);
 
     void deleteImage(Long imageId);
 }

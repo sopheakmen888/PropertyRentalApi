@@ -16,7 +16,7 @@ public class UserResponse {
 //    private String dob;
     private String email;
     private String phone;
-//    private String profilePhoto;
+    private String profilePhoto;
     private List<PropertyResponse> favorites;
     private List<String> roles;
 }
