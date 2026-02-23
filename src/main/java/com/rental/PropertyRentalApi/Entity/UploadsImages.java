@@ -30,7 +30,6 @@ public class UploadsImages {
     @JoinColumn(name = "property_id")
     private Properties property;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", unique = true)
+    @OneToOne(fetch = FetchType.LAZY)    @JoinColumn(name = "user_id", unique = true)
     private Users user;
 }

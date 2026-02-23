@@ -89,9 +89,9 @@ public class UploadsImagesServiceImpl implements UploadService {
     @Override
     public String uploadUserProfile(Long userId, MultipartFile file) {
 
-//        Users user = userRepository.findById(userId)
-//                .orElseThrow(() -> notFound("User not found."));
-        Users user = helperFunction.getAuthenticatedUser();
+        Users user = userRepository.findById(userId)
+                .orElseThrow(() -> notFound("User not found."));
+//        Users user = helperFunction.getAuthenticatedUser();
 
         try {
             Map uploadResult = cloudinaryService.upload(file, "folder");
