@@ -7,6 +7,7 @@ import com.rental.PropertyRentalApi.DTO.request.RegisterRequest;
 import com.rental.PropertyRentalApi.DTO.response.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.web.multipart.MultipartFile;
 //import org.springframework.web.multipart.MultipartFile;
 
 
@@ -22,7 +23,8 @@ public interface AuthService {
     RegisterResponse register(
             RegisterRequest request,
             HttpServletRequest httpRequest,
-            HttpServletResponse response
+            HttpServletResponse response,
+            MultipartFile profileImage
     );
 
     AuthResponse login(

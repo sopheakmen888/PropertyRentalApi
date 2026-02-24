@@ -3,13 +3,11 @@ package com.rental.PropertyRentalApi.Service.Impl;
 import com.rental.PropertyRentalApi.Entity.Properties;
 import com.rental.PropertyRentalApi.Entity.UploadsImages;
 import com.rental.PropertyRentalApi.Entity.Users;
-import com.rental.PropertyRentalApi.Enum.OwnerType;
 import com.rental.PropertyRentalApi.Repository.PropertyRepository;
 import com.rental.PropertyRentalApi.Repository.UploadsImagesRepository;
 import com.rental.PropertyRentalApi.Repository.UserRepository;
 import com.rental.PropertyRentalApi.Service.CloudinaryService;
 import com.rental.PropertyRentalApi.Service.UploadService;
-import com.rental.PropertyRentalApi.Utils.HelperFunction;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,9 +25,8 @@ public class UploadsImagesServiceImpl implements UploadService {
 
     private final UploadsImagesRepository uploadsImagesRepository;
     private final PropertyRepository propertyRepository;
-    private final UserRepository userRepository;
-    private final HelperFunction helperFunction;
     private final CloudinaryService cloudinaryService;
+    private final UserRepository userRepository;
 
     private static final long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 
@@ -53,7 +50,7 @@ public class UploadsImagesServiceImpl implements UploadService {
 
             try {
 
-                Map uploadResult = cloudinaryService.upload(file, "folder");
+                Map<?, ?> uploadResult = cloudinaryService.upload(file, "folder");
 
                 String imageUrl = uploadResult.get("secure_url").toString();
                 String publicId = uploadResult.get("public_id").toString();
@@ -71,7 +68,6 @@ public class UploadsImagesServiceImpl implements UploadService {
                 UploadsImages image = new UploadsImages();
                 image.setUrls(imageUrl);
                 image.setPublicId(publicId);
-                image.setOwnerType(OwnerType.PROPERTY);
                 image.setProperty(properties);
 
                 uploadsImagesRepository.save(image);
@@ -89,32 +85,27 @@ public class UploadsImagesServiceImpl implements UploadService {
     @Override
     public String uploadUserProfile(Long userId, MultipartFile file) {
 
+        if (file == null || file.isEmpty()) {
+            throw badRequest("No files provided.");
+        }
+
         Users user = userRepository.findById(userId)
                 .orElseThrow(() -> notFound("User not found."));
-//        Users user = helperFunction.getAuthenticatedUser();
 
         try {
-            Map uploadResult = cloudinaryService.upload(file, "folder");
+            Map<?, ?> uploadResult = cloudinaryService.upload(file, "folder");
 
             String imageUrl = uploadResult.get("source_url").toString();
             String publicId = uploadResult.get("public_id").toString();
 
-            uploadsImagesRepository
-                    .findByUserAndOwnerType(user, OwnerType.USER)
-                    .ifPresent(old -> {
-                        try {
-                            cloudinaryService.delete(old.getPublicId());
-                            uploadsImagesRepository.delete(old);
-                        } catch (Exception ignored) {}
-                    });
+            if (user.getProfileImagePublicId() != null) {
+                cloudinaryService.delete(user.getProfileImagePublicId());
+            }
 
-            UploadsImages image = new UploadsImages();
-            image.setUrls(imageUrl);
-            image.setPublicId(publicId);
-            image.setOwnerType(OwnerType.USER);
-            image.setUser(user);
+            user.setProfileImageUrl(imageUrl);
+            user.setProfileImagePublicId(publicId);
 
-            uploadsImagesRepository.save(image);
+            userRepository.save(user);
 
             return imageUrl;
 

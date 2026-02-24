@@ -13,6 +13,7 @@ import com.rental.PropertyRentalApi.Repository.UserRepository;
 import com.rental.PropertyRentalApi.Service.AuthService;
 import com.rental.PropertyRentalApi.Service.DeviceTrackingService;
 import com.rental.PropertyRentalApi.Service.Jwt.JwtService;
+import com.rental.PropertyRentalApi.Service.UploadService;
 import com.rental.PropertyRentalApi.Utils.CookieHelper;
 
 
@@ -24,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -49,6 +51,7 @@ public class AuthServiceImpl implements AuthService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final HelperFunction helperFunction;
     private final DeviceTrackingService deviceTrackingService;
+    private final UploadService uploadService;
 
     @Override
     public RefreshTokenResponse refreshToken(
@@ -153,7 +156,8 @@ public class AuthServiceImpl implements AuthService {
     public RegisterResponse register(
             RegisterRequest request,
             HttpServletRequest httpRequest,
-            HttpServletResponse response
+            HttpServletResponse response,
+            MultipartFile profileImage
     ) {
         // Validate username
         if (userRepository.findByUsername(request.getUsername()).isPresent()) {
@@ -195,6 +199,13 @@ public class AuthServiceImpl implements AuthService {
         // SAVE USER
         // ========================
         Users savedUser = userRepository.save(user);
+
+        // ========================
+        // VALIDATE USER PROFILE
+        // ========================
+        if (profileImage != null && !profileImage.isEmpty()) {
+            uploadService.uploadUserProfile(savedUser.getId(), profileImage);
+        }
 
         // ============================
         // Track device (AUTO-LOGIN)

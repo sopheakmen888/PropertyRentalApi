@@ -1,5 +1,6 @@
 package com.rental.PropertyRentalApi.Service;
 
+import com.rental.PropertyRentalApi.Entity.Users;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;

@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -39,9 +40,10 @@ public class AuthController {
     public ResponseEntity<RegisterResponse> register(
             @RequestBody RegisterRequest request,
             HttpServletRequest httpRequest,
-            HttpServletResponse response
+            HttpServletResponse response,
+            MultipartFile profileImage
     ) {
-        RegisterResponse result = authService.register(request, httpRequest, response);
+        RegisterResponse result = authService.register(request, httpRequest, response, profileImage);
         return ResponseEntity.ok(result);
     }
 

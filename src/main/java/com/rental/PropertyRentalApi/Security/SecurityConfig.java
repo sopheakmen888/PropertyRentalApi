@@ -84,20 +84,21 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                                 .requestMatchers("/api/public/**").permitAll()
                                 .requestMatchers("/api/uploads/**").permitAll()
+//                                .requestMatchers("/api/users/profile").permitAll()
 
                                 // ============================
                                 // AUTHENTICATED ENDPOINT
                                 // ============================
                                 .requestMatchers("/api/reviews/**").authenticated()
+                                .requestMatchers("/api/users/profile").authenticated()
                                 .requestMatchers("/api/users/me").authenticated()
-                                .requestMatchers("/api/users/profile/**").authenticated()
                                 .requestMatchers("/api/properties/favorite/**").authenticated()
 
                         // ============================
                         // ROLE BASE AUTHORIZATION
                         // ============================
 //                        .requestMatchers("/api/users/**").hasRole("admin")
-                                .requestMatchers("/api/users/**").hasRole("admin")
+                                .requestMatchers("/api/admin/**").hasRole("admin")
                         .requestMatchers("/api/properties/**").hasAnyRole("admin", "agent")
 
                 // DEV: allow all endpoints

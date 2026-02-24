@@ -1,8 +1,10 @@
 package com.rental.PropertyRentalApi.Controller;
 
+import com.rental.PropertyRentalApi.Entity.Users;
 import com.rental.PropertyRentalApi.Service.UploadService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -30,13 +32,30 @@ public class UploadsImagesController {
         return ResponseEntity.ok("Image deleted successfully.");
     }
 
-    @PostMapping("/users/profile/{userId}")
+//    @PostMapping("/users/profile")
+//    public ResponseEntity<?> uploadProfile(
+//            Authentication authentication,
+//            @RequestParam("file") MultipartFile file
+//            ) {
+//
+//        Long userId = Long.parseLong(authentication.getName());
+//
+//        String imageUrl = uploadService.uploadUserProfile(userId, file);
+//
+//        return ResponseEntity.ok(imageUrl);
+//    }
+
+    @PostMapping("/users/profile")
     public ResponseEntity<?> uploadProfile(
-            @PathVariable Long userId,
+            Authentication authentication,
             @RequestParam("file") MultipartFile file
     ) {
-        return ResponseEntity.ok(
-                uploadService.uploadUserProfile(userId, file)
-        );
+
+        Users user = (Users) authentication.getPrincipal();
+        Long userId = user.getId();
+
+        String imageUrl = uploadService.uploadUserProfile(userId, file);
+
+        return ResponseEntity.ok(imageUrl);
     }
 }
