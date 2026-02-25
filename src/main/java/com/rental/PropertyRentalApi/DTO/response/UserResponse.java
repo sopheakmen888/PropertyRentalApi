@@ -1,5 +1,6 @@
 package com.rental.PropertyRentalApi.DTO.response;
 
+import com.rental.PropertyRentalApi.Entity.UsersProfile;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,7 +17,7 @@ public class UserResponse {
 //    private String dob;
     private String email;
     private String phone;
-    private String profilePhoto;
+    private String profile;
     private List<PropertyResponse> favorites;
     private List<String> roles;
 }

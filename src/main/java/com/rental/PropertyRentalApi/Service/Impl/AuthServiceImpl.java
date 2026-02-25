@@ -6,7 +6,8 @@ import com.rental.PropertyRentalApi.DTO.request.AuthRequest;
 import com.rental.PropertyRentalApi.Entity.RefreshToken;
 import com.rental.PropertyRentalApi.Entity.Roles;
 import com.rental.PropertyRentalApi.Entity.Users;
-import com.rental.PropertyRentalApi.Mapper.MapperFunction;
+import com.rental.PropertyRentalApi.Mapper.MapperConfiguration;
+import com.rental.PropertyRentalApi.Mapper.UserMapper;
 import com.rental.PropertyRentalApi.Repository.RefreshTokenRepository;
 import com.rental.PropertyRentalApi.Repository.RoleRepository;
 import com.rental.PropertyRentalApi.Repository.UserRepository;
@@ -18,9 +19,11 @@ import com.rental.PropertyRentalApi.Utils.CookieHelper;
 
 
 import com.rental.PropertyRentalApi.Utils.HelperFunction;
+import com.rental.PropertyRentalApi.Utils.UserValidatorUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -47,9 +50,10 @@ public class AuthServiceImpl implements AuthService {
     private final JwtService jwtService;
     private final CookieHelper cookieHelper;
     private final RoleRepository roleRepository;
-    private final MapperFunction mapperFunction;
+    private final UserMapper userMapper;
     private final RefreshTokenRepository refreshTokenRepository;
     private final HelperFunction helperFunction;
+    private final UserValidatorUtil userValidator;
     private final DeviceTrackingService deviceTrackingService;
     private final UploadService uploadService;
 
@@ -153,6 +157,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @Transactional
     public RegisterResponse register(
             RegisterRequest request,
             HttpServletRequest httpRequest,
@@ -170,12 +175,12 @@ public class AuthServiceImpl implements AuthService {
         }
 
         // Validate email format
-        helperFunction.validateEmailFormat(request.getEmail());
+        userValidator.validateEmailFormat(request.getEmail());
 
         // ========================
         // MAP REQUEST TO ENTITY USING MAPSTRUCT
         // ========================
-        Users user = mapperFunction.toUserEntity(request);
+        Users user = userMapper.toUserEntity(request);
 
         // Set encoded password (can't be done by MapStruct)
         user.setPassword(passwordEncoder.encode(request.getPassword()));
@@ -270,7 +275,7 @@ public class AuthServiceImpl implements AuthService {
         // ========================
         // MAP USER TO RESPONSE USING MAPSTRUCT
         // ========================
-        UserResponse userResponse = mapperFunction.toUserResponse(savedUser);
+        UserResponse userResponse = userMapper.toUserResponse(savedUser);
 
         return new RegisterResponse(
                 201,
@@ -287,7 +292,10 @@ public class AuthServiceImpl implements AuthService {
             HttpServletResponse response
     ) {
 
-        Users user = userRepository.findByEmail(request.getEmail())
+//        Thread.sleep(500);
+
+        Users user = userRepository.findByEmail(request.getLogin())
+                .or(() -> userRepository.findByUsername(request.getLogin()))
                 .orElseThrow(() -> notFound("User not found."));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
@@ -305,7 +313,7 @@ public class AuthServiceImpl implements AuthService {
         // ========================
         // MAP USER TO RESPONSE USING MAPSTRUCT
         // ========================
-        UserResponse userResponse = mapperFunction.toUserResponse(user);
+        UserResponse userResponse = userMapper.toUserResponse(user);
 
         // ============================
         // Track device login

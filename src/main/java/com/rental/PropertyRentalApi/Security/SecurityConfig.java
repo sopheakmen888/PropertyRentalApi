@@ -91,7 +91,7 @@ public class SecurityConfig {
                                 // ============================
                                 .requestMatchers("/api/reviews/**").authenticated()
                                 .requestMatchers("/api/users/profile").authenticated()
-                                .requestMatchers("/api/users/me").authenticated()
+                                .requestMatchers("/api/me").authenticated()
                                 .requestMatchers("/api/properties/favorite/**").authenticated()
 
                         // ============================

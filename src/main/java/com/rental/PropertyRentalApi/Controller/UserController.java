@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/admin/users")
+@RequestMapping("/api")
 public class UserController {
 
     private final UserService userService;
@@ -19,7 +19,7 @@ public class UserController {
     // ==============
     // GET ALL USERS WITH PAGINATION
     // ==============
-    @GetMapping
+    @GetMapping("/admin/users")
     public ApiResponse<?> getAllUsers(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
@@ -37,7 +37,7 @@ public class UserController {
     // =====================
     // GET USER BY ID
     // =====================
-    @GetMapping("/{id}")
+    @GetMapping("/admin/users/{id}")
     public ApiResponse<UserResponse> getUserById(@PathVariable Long id) {
         UserResponse getUserId = userService.getById(id);
 
@@ -52,7 +52,7 @@ public class UserController {
     // =====================
     // CREATE USER
     // =====================
-    @PostMapping
+    @PostMapping("/admin/users")
     public ApiResponse<UserResponse> createUser(
             @RequestBody UserCreateRequest request
     ) {
@@ -69,7 +69,7 @@ public class UserController {
     // =====================
     // UPDATE USER (PROFILE ONLY)
     // =====================
-    @PutMapping("/{id}")
+    @PutMapping("/admin/users/{id}")
     public ApiResponse<UserResponse> updateUser(
             @PathVariable Long id,
             @RequestBody UserUpdateRequest request
@@ -87,7 +87,7 @@ public class UserController {
     // =====================
     // DELETE USER
     // =====================
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/admin/users/{id}")
     public ApiResponse<String> deleteUser(@PathVariable Long id) {
 
         userService.delete(id);

@@ -3,9 +3,11 @@ package com.rental.PropertyRentalApi.Service.Impl;
 import com.rental.PropertyRentalApi.Entity.Properties;
 import com.rental.PropertyRentalApi.Entity.UploadsImages;
 import com.rental.PropertyRentalApi.Entity.Users;
+import com.rental.PropertyRentalApi.Entity.UsersProfile;
 import com.rental.PropertyRentalApi.Repository.PropertyRepository;
 import com.rental.PropertyRentalApi.Repository.UploadsImagesRepository;
 import com.rental.PropertyRentalApi.Repository.UserRepository;
+import com.rental.PropertyRentalApi.Repository.UsersProfileRepository;
 import com.rental.PropertyRentalApi.Service.CloudinaryService;
 import com.rental.PropertyRentalApi.Service.UploadService;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +29,7 @@ public class UploadsImagesServiceImpl implements UploadService {
     private final PropertyRepository propertyRepository;
     private final CloudinaryService cloudinaryService;
     private final UserRepository userRepository;
+    private final UsersProfileRepository usersProfileRepository;
 
     private static final long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 
@@ -50,13 +53,7 @@ public class UploadsImagesServiceImpl implements UploadService {
 
             try {
 
-                Map<?, ?> uploadResult = cloudinaryService.upload(file, "folder");
-
-                String imageUrl = uploadResult.get("secure_url").toString();
-                String publicId = uploadResult.get("public_id").toString();
-
                 String contentType = file.getContentType();
-
                 if (contentType == null ||
                         (!contentType.equals("image/jpeg") &&
                                 !contentType.equals("image/png") &&
@@ -64,6 +61,11 @@ public class UploadsImagesServiceImpl implements UploadService {
 
                     throw badRequest("Only jpg, jpeg, png images are allowed.");
                 }
+
+                Map<?, ?> uploadResult = cloudinaryService.upload(file, "folder");
+
+                String imageUrl = uploadResult.get("secure_url").toString();
+                String publicId = uploadResult.get("public_id").toString();
 
                 UploadsImages image = new UploadsImages();
                 image.setUrls(imageUrl);
@@ -93,19 +95,30 @@ public class UploadsImagesServiceImpl implements UploadService {
                 .orElseThrow(() -> notFound("User not found."));
 
         try {
-            Map<?, ?> uploadResult = cloudinaryService.upload(file, "folder");
 
-            String imageUrl = uploadResult.get("source_url").toString();
-            String publicId = uploadResult.get("public_id").toString();
-
-            if (user.getProfileImagePublicId() != null) {
-                cloudinaryService.delete(user.getProfileImagePublicId());
+            String contentType = file.getContentType();
+            if (contentType == null ||
+                    (!contentType.equals("image/jpeg") &&
+                            !contentType.equals("image/png") &&
+                            !contentType.equals("image/jpg"))) {
+                throw badRequest("Only jpg, jpeg, png images are allowed.");
             }
 
-            user.setProfileImageUrl(imageUrl);
-            user.setProfileImagePublicId(publicId);
+            Map<?, ?> uploadResult = cloudinaryService.upload(file, "folder");
 
-            userRepository.save(user);
+            String imageUrl = (String) uploadResult.get("secure_url");
+            String publicId = (String) uploadResult.get("public_id");
+
+            if (user.getProfile() != null && user.getProfile().getPublicId() != null) {
+                cloudinaryService.delete(user.getProfile().getPublicId());
+            }
+
+            UsersProfile userProfile = new UsersProfile();
+            userProfile.setUrls(imageUrl);
+            userProfile.setPublicId(publicId);
+            userProfile.setUser(user);
+
+            usersProfileRepository.save(userProfile);
 
             return imageUrl;
 

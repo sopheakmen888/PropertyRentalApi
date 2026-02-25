@@ -43,7 +43,12 @@ public class AuthController {
             HttpServletResponse response,
             MultipartFile profileImage
     ) {
-        RegisterResponse result = authService.register(request, httpRequest, response, profileImage);
+        RegisterResponse result = authService.register(
+                request,
+                httpRequest,
+                response,
+                profileImage
+        );
         return ResponseEntity.ok(result);
     }
 

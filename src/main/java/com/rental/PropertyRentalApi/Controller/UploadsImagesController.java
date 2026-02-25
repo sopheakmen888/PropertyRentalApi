@@ -32,19 +32,6 @@ public class UploadsImagesController {
         return ResponseEntity.ok("Image deleted successfully.");
     }
 
-//    @PostMapping("/users/profile")
-//    public ResponseEntity<?> uploadProfile(
-//            Authentication authentication,
-//            @RequestParam("file") MultipartFile file
-//            ) {
-//
-//        Long userId = Long.parseLong(authentication.getName());
-//
-//        String imageUrl = uploadService.uploadUserProfile(userId, file);
-//
-//        return ResponseEntity.ok(imageUrl);
-//    }
-
     @PostMapping("/users/profile")
     public ResponseEntity<?> uploadProfile(
             Authentication authentication,

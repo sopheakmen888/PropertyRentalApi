@@ -8,7 +8,6 @@ import com.rental.PropertyRentalApi.DTO.response.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.multipart.MultipartFile;
-//import org.springframework.web.multipart.MultipartFile;
 
 
 public interface AuthService {
