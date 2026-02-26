@@ -38,6 +38,48 @@ public class PropertyServiceImpl implements PropertyService {
     private final AuthUtil authUtil;
     private final HelperFunction helperFunction;
 
+
+    // ==============
+    // SEARCH PROPERTIES BY MULTIPLE FILTERS
+    // ==============
+
+
+    @Override
+        public PaginatedResponse<PropertyResponse> searchProperties1(String title, String description, String categoryName,
+                int page, int size, String address, String propertyType) {
+        
+                Pageable pageable = PageRequest.of(page, size);
+        
+                Page<Properties> propertyPage = propertyRepository.searchProperties(
+                        title != null ? title : "",
+                        description != null ? description : "",
+                        categoryName != null ? categoryName : "",
+                        address != null ? address : "",
+                        propertyType != null ? propertyType : "",
+                        pageable
+                );
+        
+                if (propertyPage.isEmpty()) {
+                throw notFound("No properties found matching the search criteria.");
+                }
+        
+                List<PropertyResponse> propertyResponses = propertyPage.getContent()
+                        .stream()
+                        .map(propertyMapper::toPropertyResponse)
+                        .toList();
+        
+                PaginatedResponse.PaginationMeta paginationMeta = new PaginatedResponse.PaginationMeta(
+                        propertyPage.getNumber() + 1,
+                        propertyPage.getSize(),
+                        propertyPage.getTotalElements(),
+                        propertyPage.getTotalPages(),
+                        propertyPage.hasNext(),
+                        propertyPage.hasPrevious()
+                );
+        
+                return new PaginatedResponse<>(propertyResponses, paginationMeta);
+        }       
+
     // ==============
     // GET ALL WITH PAGINATION
     // ==============
@@ -248,5 +290,12 @@ public class PropertyServiceImpl implements PropertyService {
         Favorites favorite = favoritesRepository.findByPropertyAndUser(property, user)
                 .orElseThrow(() -> new RuntimeException("Favorite not found"));
         favoritesRepository.delete(favorite);
+    }
+
+    @Override
+    public PaginatedResponse<PropertyResponse> searchProperties(String title, String description, String categoryName,
+                int page, int size, String address, String propertyType) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'searchProperties'");
     }
 }
