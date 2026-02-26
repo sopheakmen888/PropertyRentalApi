@@ -116,4 +116,9 @@ public class UserServiceImpl implements UserService {
 
         return userMapper.toUserResponse(currentUserData);
     }
+
+    @Override
+    public UserResponse updateProfile(Long userId, UserUpdateRequest request) {
+        return null;
+    }
 }

@@ -14,4 +14,5 @@ public interface UserService {
     void delete(Long id);
 
     UserResponse userProfileInfo();
+    UserResponse updateProfile(Long userId, UserUpdateRequest request);
 }

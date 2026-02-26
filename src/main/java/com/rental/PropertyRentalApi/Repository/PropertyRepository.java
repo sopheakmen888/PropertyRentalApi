@@ -23,6 +23,7 @@ public interface PropertyRepository extends JpaRepository<Properties, Long>,JpaS
     // Find properties created by a specific user
     List<Properties> findAllByCreatedBy(Users user);
 
-    Page<Properties> searchProperties(Object object, Object object2, Object object3, Object object4, Object object5,
-            Pageable pageable);
+//    Page<Properties> searchProperties(Object object, Object object2, Object object3, Object object4, Object object5,
+//            Pageable pageable);
+
 }
