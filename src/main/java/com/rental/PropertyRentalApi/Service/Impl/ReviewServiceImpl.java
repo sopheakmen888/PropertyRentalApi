@@ -6,7 +6,6 @@ import com.rental.PropertyRentalApi.DTO.response.ReviewResponse;
 import com.rental.PropertyRentalApi.Entity.Properties;
 import com.rental.PropertyRentalApi.Entity.Reviews;
 import com.rental.PropertyRentalApi.Entity.Users;
-import com.rental.PropertyRentalApi.Mapper.MapperConfiguration;
 import com.rental.PropertyRentalApi.Mapper.ReviewMapper;
 import com.rental.PropertyRentalApi.Repository.PropertyRepository;
 import com.rental.PropertyRentalApi.Repository.ReviewRepository;
@@ -23,6 +22,7 @@ import static com.rental.PropertyRentalApi.Exception.ErrorsExceptionFactory.*;
 
 @Service
 @RequiredArgsConstructor
+@SuppressWarnings("unused")
 public class ReviewServiceImpl implements ReviewService {
 
     private final ReviewRepository reviewRepository;

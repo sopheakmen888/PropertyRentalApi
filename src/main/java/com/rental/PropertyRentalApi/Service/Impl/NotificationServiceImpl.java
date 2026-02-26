@@ -6,6 +6,7 @@ import com.rental.PropertyRentalApi.Service.NotificationService;
 import org.springframework.stereotype.Service;
 
 @Service
+@SuppressWarnings("unused")
 public class NotificationServiceImpl implements NotificationService {
 
     @Override
