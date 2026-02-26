@@ -50,7 +50,7 @@ public class PropertyServiceImpl implements PropertyService {
 
         // Fetch paginated data
         Page<Properties> propertyPage = propertyRepository.findAll(pageable);
-
+ 
         // Check if page is empty
         if (propertyPage.isEmpty()) {
             throw notFound("Properties not found.");
