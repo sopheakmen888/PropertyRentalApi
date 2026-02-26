@@ -5,10 +5,12 @@ import com.rental.PropertyRentalApi.DTO.request.PropertyUpdateRequest;
 import com.rental.PropertyRentalApi.DTO.response.PaginatedResponse;
 import com.rental.PropertyRentalApi.DTO.response.PropertyResponse;
 import com.rental.PropertyRentalApi.Entity.*;
-import com.rental.PropertyRentalApi.Mapper.MapperFunction;
+import com.rental.PropertyRentalApi.Mapper.MapperConfiguration;
+import com.rental.PropertyRentalApi.Mapper.PropertyMapper;
 import com.rental.PropertyRentalApi.Repository.*;
 import com.rental.PropertyRentalApi.Service.Jwt.JwtService;
 import com.rental.PropertyRentalApi.Service.PropertyService;
+import com.rental.PropertyRentalApi.Utils.AuthUtil;
 import com.rental.PropertyRentalApi.Utils.HelperFunction;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +18,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-//import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -33,10 +34,51 @@ public class PropertyServiceImpl implements PropertyService {
     private final CategoryRepository categoryRepository;
     private final FavoritesRepository favoritesRepository;
     private final JwtService jwtService;
-    private final MapperFunction mapperFunction;
+    private final PropertyMapper propertyMapper;
+    private final AuthUtil authUtil;
     private final HelperFunction helperFunction;
 
-    private static final long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
+
+    // ==============
+    // SEARCH PROPERTIES BY MULTIPLE FILTERS
+    // ==============
+
+
+    @Override
+        public PaginatedResponse<PropertyResponse> searchProperties1(String title, String description, String categoryName,
+                int page, int size, String address, String propertyType) {
+        
+                Pageable pageable = PageRequest.of(page, size);
+        
+                Page<Properties> propertyPage = propertyRepository.searchProperties(
+                        title != null ? title : "",
+                        description != null ? description : "",
+                        categoryName != null ? categoryName : "",
+                        address != null ? address : "",
+                        propertyType != null ? propertyType : "",
+                        pageable
+                );
+        
+                if (propertyPage.isEmpty()) {
+                throw notFound("No properties found matching the search criteria.");
+                }
+        
+                List<PropertyResponse> propertyResponses = propertyPage.getContent()
+                        .stream()
+                        .map(propertyMapper::toPropertyResponse)
+                        .toList();
+        
+                PaginatedResponse.PaginationMeta paginationMeta = new PaginatedResponse.PaginationMeta(
+                        propertyPage.getNumber() + 1,
+                        propertyPage.getSize(),
+                        propertyPage.getTotalElements(),
+                        propertyPage.getTotalPages(),
+                        propertyPage.hasNext(),
+                        propertyPage.hasPrevious()
+                );
+        
+                return new PaginatedResponse<>(propertyResponses, paginationMeta);
+        }       
 
     // ==============
     // GET ALL WITH PAGINATION
@@ -50,7 +92,7 @@ public class PropertyServiceImpl implements PropertyService {
 
         // Fetch paginated data
         Page<Properties> propertyPage = propertyRepository.findAll(pageable);
-
+ 
         // Check if page is empty
         if (propertyPage.isEmpty()) {
             throw notFound("Properties not found.");
@@ -59,7 +101,7 @@ public class PropertyServiceImpl implements PropertyService {
         // Map entities to responses
         List<PropertyResponse> propertyResponses = propertyPage.getContent()
                 .stream()
-                .map(mapperFunction::toPropertyResponse)
+                .map(propertyMapper::toPropertyResponse)
                 .toList();
 
         // Build pagination metadata
@@ -84,7 +126,7 @@ public class PropertyServiceImpl implements PropertyService {
         Properties property = propertyRepository.findById(id)
                 .orElseThrow(() -> notFound("Property not found."));
 
-        return mapperFunction.toPropertyResponse(property);
+        return propertyMapper.toPropertyResponse(property);
     }
 
     // ==============
@@ -98,7 +140,7 @@ public class PropertyServiceImpl implements PropertyService {
         // ==============
         // GET CURRENT USER
         // ==============
-        Users currentUser = helperFunction.getAuthenticatedUser();
+        Users currentUser = authUtil.getAuthenticatedUser();
 
         // ==============
         // GET CATEGORY
@@ -109,7 +151,7 @@ public class PropertyServiceImpl implements PropertyService {
         // ==============
         // MAP REQUEST TO ENTITY
         // ==============
-        Properties property = mapperFunction.toPropertyEntity(request);
+        Properties property = propertyMapper.toPropertyEntity(request);
 
         // ==============
         // SET CREATED BY USER
@@ -122,7 +164,7 @@ public class PropertyServiceImpl implements PropertyService {
         // ==============
         Properties savedProperty =  propertyRepository.save(property);
 
-        return mapperFunction.toPropertyResponse(savedProperty);
+        return propertyMapper.toPropertyResponse(savedProperty);
     }
 
     // ==============
@@ -133,7 +175,7 @@ public class PropertyServiceImpl implements PropertyService {
         // ==============
         // GET CURRENT USER
         // ==============
-        Users currentUser = helperFunction.getAuthenticatedUser();
+        Users currentUser = authUtil.getAuthenticatedUser();
 
         // ==============
         // GET CATEGORY
@@ -156,13 +198,13 @@ public class PropertyServiceImpl implements PropertyService {
         // ==============
         // UPDATE PROPERTY DETAILS
         // ==============
-        mapperFunction.updatePropertyEntity(request, property);
+        propertyMapper.updatePropertyEntity(request, property);
 
         property.setCategory(category);
 
         Properties updated = propertyRepository.save(property);
 
-        return mapperFunction.toPropertyResponse(updated);
+        return propertyMapper.toPropertyResponse(updated);
     }
 
     // ==============
@@ -171,7 +213,7 @@ public class PropertyServiceImpl implements PropertyService {
     @Override
     public void delete(Long id) {
 
-        Users currentUser = helperFunction.getAuthenticatedUser();
+        Users currentUser = authUtil.getAuthenticatedUser();
 
         Properties property = propertyRepository.findById(id)
                 .orElseThrow(() -> notFound("Property not found."));
@@ -197,7 +239,7 @@ public class PropertyServiceImpl implements PropertyService {
         // ==============
         // GET CURRENT USER
         // ==============
-        Users currentUser = helperFunction.getAuthenticatedUser();
+        Users currentUser = authUtil.getAuthenticatedUser();
 
         // ==============
         // GET USER'S PROPERTIES
@@ -216,7 +258,7 @@ public class PropertyServiceImpl implements PropertyService {
         // MAP TO RESPONSE DTO
         // ==============
         return propertiesByCurrentUser.stream()
-                .map(mapperFunction::toPropertyResponse)
+                .map(propertyMapper::toPropertyResponse)
                 .toList();
     }
 
@@ -250,4 +292,10 @@ public class PropertyServiceImpl implements PropertyService {
         favoritesRepository.delete(favorite);
     }
 
+    @Override
+    public PaginatedResponse<PropertyResponse> searchProperties(String title, String description, String categoryName,
+                int page, int size, String address, String propertyType) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'searchProperties'");
+    }
 }

@@ -24,4 +24,10 @@ public interface PropertyService {
     void addFavorite(Long propertyId, Long userId);
 
     void removeFavorite(Long propertyId, Long userId);
+
+    PaginatedResponse<PropertyResponse> searchProperties(String title, String description, String categoryName,
+            int page, int size, String address, String propertyType);
+
+    PaginatedResponse<PropertyResponse> searchProperties1(String title, String description, String categoryName,
+            int page, int size, String address, String propertyType);
 }
