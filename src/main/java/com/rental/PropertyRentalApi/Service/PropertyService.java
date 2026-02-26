@@ -25,8 +25,6 @@ public interface PropertyService {
 
     void removeFavorite(Long propertyId, Long userId);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
     PaginatedResponse<PropertyResponse> searchProperties(
             String title,
             String description,
@@ -35,10 +33,4 @@ public interface PropertyService {
             String propertyType,
             int page, int size
     );
-=======
->>>>>>> 53acec6 (add image favorite)
-=======
-    PaginatedResponse<PropertyResponse> searchProperties(String title, String description, String categoryName,
-            int page, int size, String address, String propertyType);
->>>>>>> c471626 (serchpropery)
 }
