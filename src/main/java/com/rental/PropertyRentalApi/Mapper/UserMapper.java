@@ -4,17 +4,16 @@ import com.rental.PropertyRentalApi.DTO.request.RegisterRequest;
 import com.rental.PropertyRentalApi.DTO.request.UserCreateRequest;
 import com.rental.PropertyRentalApi.DTO.request.UserUpdateRequest;
 import com.rental.PropertyRentalApi.DTO.response.UserResponse;
-import com.rental.PropertyRentalApi.Entity.Roles;
 import com.rental.PropertyRentalApi.Entity.Users;
 import com.rental.PropertyRentalApi.Entity.UsersProfile;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-import java.util.List;
-import java.util.Set;
-
-@Mapper(config = MapperConfiguration.class, uses = UserMapper.class)
+@Mapper(
+        config = MapperConfiguration.class,
+        uses = { FavoriteMapper.class, RoleMapper.class }
+)
 public interface UserMapper {
 
     // ============
@@ -40,23 +39,13 @@ public interface UserMapper {
     // ============
     @Mapping(target = "roles", source = "roles")
     @Mapping(target = "profile", expression = "java(mapProfile(user.getProfile()))")
-    @Mapping(target = "favorites", expression = "java(mapFavorites(user.getFavorites()))")
     UserResponse toUserResponse(Users user);
 
     // ============
-    // HELPERS
+    // PROFILE MAPPER
     // ============
     default String mapProfile(UsersProfile profile) {
         if (profile == null) return null;
         return profile.getUrls();
-    }
-
-    default List<String> mapRoles(Set<Roles> roles) {
-        if (roles == null) {
-            return List.of();
-        }
-        return roles.stream()
-                .map(Roles::getName)
-                .toList();
     }
 }
