@@ -8,6 +8,7 @@ import com.rental.PropertyRentalApi.DTO.response.PaginatedResponse;
 import com.rental.PropertyRentalApi.DTO.response.PropertyResponse;
 import com.rental.PropertyRentalApi.Service.Jwt.JwtService;
 import com.rental.PropertyRentalApi.Service.PropertyService;
+import com.rental.PropertyRentalApi.Utils.AuthUtil;
 import com.rental.PropertyRentalApi.Utils.HelperFunction;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ public class PropertyController {
 
     private final PropertyService propertyService;
     private final HelperFunction helperFunction;
+    private final AuthUtil authUtil;
 
     // ==============
     // GET ALL WITH PAGINATION
@@ -132,7 +134,7 @@ public class PropertyController {
     @PostMapping("/properties/favorite/{id}")
     public ApiResponse<Void> addFavorite(@PathVariable Long id) {
 
-        Users currentUser = helperFunction.getAuthenticatedUser();
+        Users currentUser = authUtil.getAuthenticatedUser();
 
         propertyService.addFavorite(id, currentUser.getId());
 
@@ -148,7 +150,7 @@ public class PropertyController {
     // ============================
     @DeleteMapping("/properties/{id}/favorite")
     public ApiResponse<Void> removeFavorite(@PathVariable Long id) {
-        Users currentUser = helperFunction.getAuthenticatedUser()
+        Users currentUser = authUtil.getAuthenticatedUser()
                 ;
         propertyService.removeFavorite(id, currentUser.getId());
 

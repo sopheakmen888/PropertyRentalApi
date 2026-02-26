@@ -1,16 +1,12 @@
 package com.rental.PropertyRentalApi.Entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "uploads_images")
+@Table(name = "users_profile")
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class UploadsImages {
+public class UsersProfile {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,7 +18,7 @@ public class UploadsImages {
     @Column(name = "public_id")
     private String publicId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "property_id")
-    private Properties property;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private Users user;
 }

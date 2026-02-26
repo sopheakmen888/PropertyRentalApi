@@ -5,10 +5,12 @@ import com.rental.PropertyRentalApi.DTO.request.PropertyUpdateRequest;
 import com.rental.PropertyRentalApi.DTO.response.PaginatedResponse;
 import com.rental.PropertyRentalApi.DTO.response.PropertyResponse;
 import com.rental.PropertyRentalApi.Entity.*;
-import com.rental.PropertyRentalApi.Mapper.MapperFunction;
+import com.rental.PropertyRentalApi.Mapper.MapperConfiguration;
+import com.rental.PropertyRentalApi.Mapper.PropertyMapper;
 import com.rental.PropertyRentalApi.Repository.*;
 import com.rental.PropertyRentalApi.Service.Jwt.JwtService;
 import com.rental.PropertyRentalApi.Service.PropertyService;
+import com.rental.PropertyRentalApi.Utils.AuthUtil;
 import com.rental.PropertyRentalApi.Utils.HelperFunction;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +34,8 @@ public class PropertyServiceImpl implements PropertyService {
     private final CategoryRepository categoryRepository;
     private final FavoritesRepository favoritesRepository;
     private final JwtService jwtService;
-    private final MapperFunction mapperFunction;
+    private final PropertyMapper propertyMapper;
+    private final AuthUtil authUtil;
     private final HelperFunction helperFunction;
 
     // ==============
@@ -56,7 +59,7 @@ public class PropertyServiceImpl implements PropertyService {
         // Map entities to responses
         List<PropertyResponse> propertyResponses = propertyPage.getContent()
                 .stream()
-                .map(mapperFunction::toPropertyResponse)
+                .map(propertyMapper::toPropertyResponse)
                 .toList();
 
         // Build pagination metadata
@@ -81,7 +84,7 @@ public class PropertyServiceImpl implements PropertyService {
         Properties property = propertyRepository.findById(id)
                 .orElseThrow(() -> notFound("Property not found."));
 
-        return mapperFunction.toPropertyResponse(property);
+        return propertyMapper.toPropertyResponse(property);
     }
 
     // ==============
@@ -95,7 +98,7 @@ public class PropertyServiceImpl implements PropertyService {
         // ==============
         // GET CURRENT USER
         // ==============
-        Users currentUser = helperFunction.getAuthenticatedUser();
+        Users currentUser = authUtil.getAuthenticatedUser();
 
         // ==============
         // GET CATEGORY
@@ -106,7 +109,7 @@ public class PropertyServiceImpl implements PropertyService {
         // ==============
         // MAP REQUEST TO ENTITY
         // ==============
-        Properties property = mapperFunction.toPropertyEntity(request);
+        Properties property = propertyMapper.toPropertyEntity(request);
 
         // ==============
         // SET CREATED BY USER
@@ -119,7 +122,7 @@ public class PropertyServiceImpl implements PropertyService {
         // ==============
         Properties savedProperty =  propertyRepository.save(property);
 
-        return mapperFunction.toPropertyResponse(savedProperty);
+        return propertyMapper.toPropertyResponse(savedProperty);
     }
 
     // ==============
@@ -130,7 +133,7 @@ public class PropertyServiceImpl implements PropertyService {
         // ==============
         // GET CURRENT USER
         // ==============
-        Users currentUser = helperFunction.getAuthenticatedUser();
+        Users currentUser = authUtil.getAuthenticatedUser();
 
         // ==============
         // GET CATEGORY
@@ -153,13 +156,13 @@ public class PropertyServiceImpl implements PropertyService {
         // ==============
         // UPDATE PROPERTY DETAILS
         // ==============
-        mapperFunction.updatePropertyEntity(request, property);
+        propertyMapper.updatePropertyEntity(request, property);
 
         property.setCategory(category);
 
         Properties updated = propertyRepository.save(property);
 
-        return mapperFunction.toPropertyResponse(updated);
+        return propertyMapper.toPropertyResponse(updated);
     }
 
     // ==============
@@ -168,7 +171,7 @@ public class PropertyServiceImpl implements PropertyService {
     @Override
     public void delete(Long id) {
 
-        Users currentUser = helperFunction.getAuthenticatedUser();
+        Users currentUser = authUtil.getAuthenticatedUser();
 
         Properties property = propertyRepository.findById(id)
                 .orElseThrow(() -> notFound("Property not found."));
@@ -194,7 +197,7 @@ public class PropertyServiceImpl implements PropertyService {
         // ==============
         // GET CURRENT USER
         // ==============
-        Users currentUser = helperFunction.getAuthenticatedUser();
+        Users currentUser = authUtil.getAuthenticatedUser();
 
         // ==============
         // GET USER'S PROPERTIES
@@ -213,7 +216,7 @@ public class PropertyServiceImpl implements PropertyService {
         // MAP TO RESPONSE DTO
         // ==============
         return propertiesByCurrentUser.stream()
-                .map(mapperFunction::toPropertyResponse)
+                .map(propertyMapper::toPropertyResponse)
                 .toList();
     }
 
