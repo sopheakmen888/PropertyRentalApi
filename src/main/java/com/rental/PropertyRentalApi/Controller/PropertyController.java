@@ -25,44 +25,44 @@ public class PropertyController {
     private final AuthUtil authUtil;
 
 
-        // ==============
-        // SEARCH PROPERTIES BY MULTIPLE FILTERS
-        // ==============
-        @GetMapping("/public/properties/search")        
-        public ApiResponse<PaginatedResponse<PropertyResponse>> searchProperties(
-                @RequestParam(required = false) String title,
-                @RequestParam(required = false) String description,
-                @RequestParam(required = false) String categoryName,
-                @RequestParam(required = false) String address,
-                @RequestParam(required = false) String propertyType,
-                @RequestParam(defaultValue = "0") int page,
-                @RequestParam(defaultValue = "10") int size
-        ) {
-            PaginatedResponse<PropertyResponse> paginatedProperties =
-                    propertyService.searchProperties(
-                            title,
-                            description,
-                            categoryName,
-                            address,
-                            propertyType,
-                            page,
-                            size
-                    );
+    // ==============
+    // SEARCH PROPERTIES BY MULTIPLE FILTERS
+    // ==============
+    @GetMapping("/public/properties/search")
+    public ApiResponse<PaginatedResponse<PropertyResponse>> searchProperties(
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) String description,
+            @RequestParam(required = false) String categoryName,
+            @RequestParam(required = false) String address,
+            @RequestParam(required = false) String propertyType,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        PaginatedResponse<PropertyResponse> paginatedProperties =
+                propertyService.searchProperties(
+                        title,
+                        description,
+                        categoryName,
+                        address,
+                        propertyType,
+                        page,
+                        size
+                );
 
-            String message =
-                    paginatedProperties.getItems().isEmpty()
-                            ? "No properties found."
-                            : "Properties retrieved successfully.";
+        String message =
+                paginatedProperties.getItems().isEmpty()
+                        ? "No properties found."
+                        : "Properties retrieved successfully.";
 
-            return new ApiResponse<>(
-                    200,
-                    true,
-                    message,
-                    paginatedProperties
-            );
-        }
+        return new ApiResponse<>(
+                200,
+                true,
+                message,
+                paginatedProperties
+        );
+    }
 
-    
+
     // ==============
     // GET ALL WITH PAGINATION
     // ==============

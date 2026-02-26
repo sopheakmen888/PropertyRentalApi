@@ -43,6 +43,7 @@ public class PropertyServiceImpl implements PropertyService {
     // ==============
     // SEARCH PROPERTIES BY MULTIPLE FILTERS
     // ==============
+<<<<<<< HEAD
     @Override
     public PaginatedResponse<PropertyResponse> searchProperties(
             String title,
@@ -83,6 +84,45 @@ public class PropertyServiceImpl implements PropertyService {
 
         return new PaginatedResponse<>(propertyResponses, paginationMeta);
     }
+=======
+
+
+    @Override
+        public PaginatedResponse<PropertyResponse> searchProperties(String title, String description, String categoryName,
+                int page, int size, String address, String propertyType) {
+        
+                Pageable pageable = PageRequest.of(page, size);
+        
+                Page<Properties> propertyPage = propertyRepository.searchProperties(
+                        title != null ? title : "",
+                        description != null ? description : "",
+                        categoryName != null ? categoryName : "",
+                        address != null ? address : "",
+                        propertyType != null ? propertyType : "",
+                        pageable
+                );
+        
+                if (propertyPage.isEmpty()) {
+                throw notFound("No properties found matching the search criteria.");
+                }
+        
+                List<PropertyResponse> propertyResponses = propertyPage.getContent()
+                        .stream()
+                        .map(propertyMapper::toPropertyResponse)
+                        .toList();
+        
+                PaginatedResponse.PaginationMeta paginationMeta = new PaginatedResponse.PaginationMeta(
+                        propertyPage.getNumber() + 1,
+                        propertyPage.getSize(),
+                        propertyPage.getTotalElements(),
+                        propertyPage.getTotalPages(),
+                        propertyPage.hasNext(),
+                        propertyPage.hasPrevious()
+                );
+        
+                return new PaginatedResponse<>(propertyResponses, paginationMeta);
+        }       
+>>>>>>> c471626 (serchpropery)
 
     // ==============
     // GET ALL WITH PAGINATION
