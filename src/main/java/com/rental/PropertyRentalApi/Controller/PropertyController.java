@@ -12,6 +12,8 @@ import com.rental.PropertyRentalApi.Utils.AuthUtil;
 import com.rental.PropertyRentalApi.Utils.HelperFunction;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,6 +27,32 @@ public class PropertyController {
     private final HelperFunction helperFunction;
     private final AuthUtil authUtil;
 
+
+      // ==============
+    // SEARCH PROPERTIES BY MULTIPLE FILTERS
+    // ==============
+        @GetMapping("/public/properties/search")        
+        public ApiResponse<PaginatedResponse<PropertyResponse>> searchProperties(
+                @RequestParam(required = false) String title,
+                @RequestParam(required = false) String description,
+                @RequestParam(required = false) String categoryName,
+                @RequestParam(defaultValue = "0") int page,
+                @RequestParam(defaultValue = "10") int size,
+                @RequestParam(required = false) String address,
+                @RequestParam(required = false) String propertyType
+        ) {
+            PaginatedResponse<PropertyResponse> paginatedProperties =
+                    propertyService.searchProperties(title, description, categoryName, page, size, address, propertyType);
+
+            return new ApiResponse<>(
+                    200,
+                    true,
+                    "ok",
+                    paginatedProperties
+            );
+        }
+
+    
     // ==============
     // GET ALL WITH PAGINATION
     // ==============
