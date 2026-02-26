@@ -14,6 +14,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
+@SuppressWarnings("unused")
 public class UserDeviceController {
 
     private final UserDeviceService userDeviceService;
