@@ -14,16 +14,21 @@ public class PropertySpecification {
             String description,
             String categoryName,
             String address,
+<<<<<<< HEAD
             String propertyType,
             Long provinceId,
             Long districtId,
             Long communeId
+=======
+            String propertyType
+>>>>>>> 2887ad5 (fix search feature and add update authenticated user profile)
     ) {
 
         return (root, query, cb) -> {
 
             List<Predicate> predicates = new ArrayList<>();
 
+<<<<<<< HEAD
             // ======================
             // TEXT SEARCH
             // ======================
@@ -34,10 +39,17 @@ public class PropertySpecification {
                                 "%" + title.toLowerCase() + "%"
                         )
                 );
+=======
+            if (title != null && !title.isBlank()) {
+                predicates.add(
+                        cb.like(cb.lower(root.get("title")),
+                                "%" + title.toLowerCase() + "%"));
+>>>>>>> 2887ad5 (fix search feature and add update authenticated user profile)
             }
 
             if (description != null && !description.isBlank()) {
                 predicates.add(
+<<<<<<< HEAD
                         cb.like(
                                 cb.lower(root.get("description")),
                                 "%" + description.toLowerCase() + "%"
@@ -52,19 +64,29 @@ public class PropertySpecification {
                                 "%" + categoryName.toLowerCase() + "%"
                         )
                 );
+=======
+                        cb.like(cb.lower(root.get("description")),
+                                "%" + description.toLowerCase() + "%"));
+>>>>>>> 2887ad5 (fix search feature and add update authenticated user profile)
             }
 
             if (address != null && !address.isBlank()) {
                 predicates.add(
+<<<<<<< HEAD
                         cb.like(
                                 cb.lower(root.get("address")),
                                 "%" + address.toLowerCase() + "%"
                         )
                 );
+=======
+                        cb.like(cb.lower(root.get("address")),
+                                "%" + address.toLowerCase() + "%"));
+>>>>>>> 2887ad5 (fix search feature and add update authenticated user profile)
             }
 
             if (propertyType != null && !propertyType.isBlank()) {
                 predicates.add(
+<<<<<<< HEAD
                         cb.equal(root.get("propertyType"), propertyType)
                 );
             }
@@ -103,6 +125,9 @@ public class PropertySpecification {
                                 communeId
                         )
                 );
+=======
+                        cb.equal(root.get("propertyType"), propertyType));
+>>>>>>> 2887ad5 (fix search feature and add update authenticated user profile)
             }
 
             return cb.and(predicates.toArray(new Predicate[0]));
