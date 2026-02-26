@@ -41,8 +41,6 @@ public class PropertyServiceImpl implements PropertyService {
     // ==============
     // SEARCH PROPERTIES BY MULTIPLE FILTERS
     // ==============
-
-
     @Override
         public PaginatedResponse<PropertyResponse> searchProperties1(String title, String description, String categoryName,
                 int page, int size, String address, String propertyType) {
