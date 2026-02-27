@@ -42,7 +42,20 @@ public interface PropertyMapper {
         }
 
         return images.stream()
-                .map(image -> "/uploads/" + image.getUrls())
+                .map(image -> {
+                    String url = image.getUrls();
+                    if (url == null || url.isBlank()) {
+                        return null;
+                    }
+
+                    // Cloudinary or external URL
+                    if (url.startsWith("http://") || url.startsWith("https://")) {
+                        return url;
+                    }
+
+                    // Local file
+                    return "/uploads/" + url;
+                })
                 .toList();
     }
 }
