@@ -1,9 +1,11 @@
 package com.rental.PropertyRentalApi.Scripts;
 
 import com.rental.PropertyRentalApi.Entity.Categories;
+import com.rental.PropertyRentalApi.Entity.Commune;
 import com.rental.PropertyRentalApi.Entity.Properties;
 import com.rental.PropertyRentalApi.Entity.Users;
 import com.rental.PropertyRentalApi.Repository.CategoryRepository;
+import com.rental.PropertyRentalApi.Repository.CommuneRepository;
 import com.rental.PropertyRentalApi.Repository.PropertyRepository;
 import com.rental.PropertyRentalApi.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +27,7 @@ public class PropertySeeder implements CommandLineRunner {
     private final PropertyRepository propertyRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
+    private final CommuneRepository communeRepository;
 
     @Override
     public void run(String... args) {
@@ -41,7 +44,9 @@ public class PropertySeeder implements CommandLineRunner {
                 new BigDecimal("120"),
                 new BigDecimal("10"),
                 new BigDecimal("5"),
-                "house");
+                "house",
+                "Toul Tompoung");
+                
 
         seedProperty(owner,
                 "Spacious 2 Bedroom Flat",
@@ -50,7 +55,8 @@ public class PropertySeeder implements CommandLineRunner {
                 new BigDecimal("250"),
                 new BigDecimal("20"),
                 new BigDecimal("10"),
-                "apartment");
+                "apartment",
+                "Boeng Keng Kang II");
 
         seedProperty(owner,
                 "Modern Condo",
@@ -59,7 +65,8 @@ public class PropertySeeder implements CommandLineRunner {
                 new BigDecimal("400"),
                 new BigDecimal("30"),
                 new BigDecimal("15"),
-                "condo");
+                "condo",
+                "Boeng Keng Kang I");
 
         log.info("Property seeding completed.");
     }
@@ -72,7 +79,8 @@ public class PropertySeeder implements CommandLineRunner {
             BigDecimal price,
             BigDecimal electricityCost,
             BigDecimal waterCost,
-            String categoryName
+            String categoryName,
+            String communeName
     ) {
 
         if (propertyRepository.existsByTitle(title)) {
@@ -82,6 +90,8 @@ public class PropertySeeder implements CommandLineRunner {
 
         Categories category = categoryRepository.findByName(categoryName)
                 .orElseThrow(() -> notFound("Category '" + categoryName + "' not found. Seed categories first."));
+        Commune commune = communeRepository.findByName(communeName)
+                .orElseThrow(() -> notFound("Commune '" + communeName + "' not found."));
 
         Properties property = new Properties();
         property.setTitle(title);
@@ -94,6 +104,7 @@ public class PropertySeeder implements CommandLineRunner {
         // 🔗 VERY IMPORTANT
         property.setCreatedBy(owner);
         property.setCategory(category);
+        property.setCommune(commune);
 
         propertyRepository.save(property);
         log.info("Seeded property '{}'", title);
