@@ -30,4 +30,7 @@ public class PropertyCreateRequest {
     @NotBlank(message = "Category Name is required")
     private String categoryName;
 
+    @NotBlank(message = "Commune Name is required")
+    private String communeName;
+
 }

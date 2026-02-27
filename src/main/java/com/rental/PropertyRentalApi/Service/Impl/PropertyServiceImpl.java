@@ -249,4 +249,14 @@ public class PropertyServiceImpl implements PropertyService {
                 .orElseThrow(() -> new RuntimeException("Favorite not found"));
         favoritesRepository.delete(favorite);
     }
+
+
+    @Override
+    public List<PropertyResponse> filterProperties(Long provinceId, Long districtId, Long communeId) {
+        List<Properties> filteredProperties = propertyRepository.filterProperties(provinceId, districtId, communeId);
+        return filteredProperties.stream()
+                .map(propertyMapper::toPropertyResponse)
+                .toList();
+    
+    }
 }

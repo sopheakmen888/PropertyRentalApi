@@ -5,7 +5,6 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -47,8 +46,13 @@ public class Properties {
     @JoinColumn(name = "category_id", nullable = false)
     private Categories category;
 
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "commune_id", nullable = false)
+    private Commune commune;
+
     @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UploadsImages> images;
+
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;

@@ -24,4 +24,6 @@ public interface PropertyService {
     void addFavorite(Long propertyId, Long userId);
 
     void removeFavorite(Long propertyId, Long userId);
+
+    List<PropertyResponse> filterProperties(Long provinceId, Long districtId, Long communeId);
 }
