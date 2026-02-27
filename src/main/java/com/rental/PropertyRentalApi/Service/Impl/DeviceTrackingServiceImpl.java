@@ -3,6 +3,7 @@ package com.rental.PropertyRentalApi.Service.Impl;
 import com.rental.PropertyRentalApi.DTO.response.UserDeviceResponse;
 import com.rental.PropertyRentalApi.Entity.UserDevices;
 import com.rental.PropertyRentalApi.Entity.Users;
+import com.rental.PropertyRentalApi.Mapper.UserDeviceMapper;
 import com.rental.PropertyRentalApi.Repository.UserDeviceRepository;
 import com.rental.PropertyRentalApi.Service.DeviceInfoService;
 import com.rental.PropertyRentalApi.Service.DeviceTrackingService;
@@ -18,9 +19,11 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@SuppressWarnings("unused")
 public class DeviceTrackingServiceImpl implements DeviceTrackingService {
 
     private final UserDeviceRepository userDeviceRepository;
+    private final UserDeviceMapper userDeviceMapper;
     private final DeviceInfoService deviceInfoService;
     private final NotificationService notificationService;
 
@@ -80,14 +83,6 @@ public class DeviceTrackingServiceImpl implements DeviceTrackingService {
 
         userDeviceRepository.save(userDevices);
 
-        return new UserDeviceResponse(
-                userDevices.getId(),
-                userDevices.getDeviceType(),
-                userDevices.getDeviceName(),
-                userDevices.getOs(),
-                userDevices.getBrowser(),
-                userDevices.getLastSeenAt(),
-                userDevices.isActive()
-        );
+        return userDeviceMapper.toUserDeviceResponse(userDevices);
     }
 }

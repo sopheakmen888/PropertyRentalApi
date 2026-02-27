@@ -16,6 +16,7 @@ public class PropertyResponse {
     private BigDecimal waterCost;
 
     private CategoryResponse category;
-    private UserResponse createdBy;
     private List<String> images;
+    private UserResponse createdBy;
+    private Integer favoriteCount;
 }

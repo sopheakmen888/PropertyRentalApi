@@ -5,13 +5,14 @@ import com.rental.PropertyRentalApi.DTO.request.PropertyUpdateRequest;
 import com.rental.PropertyRentalApi.DTO.response.PaginatedResponse;
 import com.rental.PropertyRentalApi.DTO.response.PropertyResponse;
 import com.rental.PropertyRentalApi.Entity.*;
-import com.rental.PropertyRentalApi.Mapper.MapperConfiguration;
 import com.rental.PropertyRentalApi.Mapper.PropertyMapper;
 import com.rental.PropertyRentalApi.Repository.*;
 import com.rental.PropertyRentalApi.Service.Jwt.JwtService;
 import com.rental.PropertyRentalApi.Service.PropertyService;
+import com.rental.PropertyRentalApi.Specification.PropertySpecification;
 import com.rental.PropertyRentalApi.Utils.AuthUtil;
 import com.rental.PropertyRentalApi.Utils.HelperFunction;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -37,6 +38,51 @@ public class PropertyServiceImpl implements PropertyService {
     private final PropertyMapper propertyMapper;
     private final AuthUtil authUtil;
     private final HelperFunction helperFunction;
+
+
+    // ==============
+    // SEARCH PROPERTIES BY MULTIPLE FILTERS
+    // ==============
+    @Override
+    public PaginatedResponse<PropertyResponse> searchProperties(
+            String title,
+            String description,
+            String categoryName,
+            String address,
+            String propertyType,
+            int page, int size
+    ) {
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        Specification<Properties> spec =
+                PropertySpecification.search(
+                        title,
+                        description,
+                        categoryName,
+                        address,
+                        propertyType
+                );
+
+        Page<Properties> propertyPage =
+                propertyRepository.findAll(spec, pageable);
+
+        List<PropertyResponse> propertyResponses = propertyPage.getContent()
+                .stream()
+                .map(propertyMapper::toPropertyResponse)
+                .toList();
+
+        PaginatedResponse.PaginationMeta paginationMeta = new PaginatedResponse.PaginationMeta(
+                propertyPage.getNumber() + 1,
+                propertyPage.getSize(),
+                propertyPage.getTotalElements(),
+                propertyPage.getTotalPages(),
+                propertyPage.hasNext(),
+                propertyPage.hasPrevious()
+        );
+
+        return new PaginatedResponse<>(propertyResponses, paginationMeta);
+    }
 
     // ==============
     // GET ALL WITH PAGINATION
