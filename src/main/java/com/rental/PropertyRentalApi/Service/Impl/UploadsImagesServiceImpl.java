@@ -1,28 +1,32 @@
 package com.rental.PropertyRentalApi.Service.Impl;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
 import com.rental.PropertyRentalApi.Entity.Properties;
 import com.rental.PropertyRentalApi.Entity.UploadsImages;
 import com.rental.PropertyRentalApi.Entity.Users;
 import com.rental.PropertyRentalApi.Entity.UsersProfile;
+import static com.rental.PropertyRentalApi.Exception.ErrorsExceptionFactory.badRequest;
+import static com.rental.PropertyRentalApi.Exception.ErrorsExceptionFactory.internal;
+import static com.rental.PropertyRentalApi.Exception.ErrorsExceptionFactory.notFound;
 import com.rental.PropertyRentalApi.Repository.PropertyRepository;
 import com.rental.PropertyRentalApi.Repository.UploadsImagesRepository;
 import com.rental.PropertyRentalApi.Repository.UserRepository;
 import com.rental.PropertyRentalApi.Repository.UsersProfileRepository;
 import com.rental.PropertyRentalApi.Service.CloudinaryService;
 import com.rental.PropertyRentalApi.Service.UploadService;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import static com.rental.PropertyRentalApi.Exception.ErrorsExceptionFactory.*;
 
 @Service
 @RequiredArgsConstructor
+@SuppressWarnings("unused")
 public class UploadsImagesServiceImpl implements UploadService {
 
     private final UploadsImagesRepository uploadsImagesRepository;

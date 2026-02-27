@@ -8,7 +8,7 @@ import com.rental.PropertyRentalApi.DTO.response.PropertyResponse;
 import java.util.List;
 
 public interface PropertyService {
-        PaginatedResponse<PropertyResponse> getAll(int page, int size);
+    PaginatedResponse<PropertyResponse> getAll(int page, int size);
 
     PropertyResponse getById(Long id);
 
@@ -25,4 +25,12 @@ public interface PropertyService {
 
     void removeFavorite(Long propertyId, Long userId);
 
+    PaginatedResponse<PropertyResponse> searchProperties(
+            String title,
+            String description,
+            String categoryName,
+            String address,
+            String propertyType,
+            int page, int size
+    );
 }

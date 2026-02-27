@@ -1,12 +1,13 @@
 package com.rental.PropertyRentalApi.Exception;
 
-import com.rental.PropertyRentalApi.DTO.response.ApiResponse;
+import java.util.Objects;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.util.Objects;
+import com.rental.PropertyRentalApi.DTO.response.ApiResponse;
 
 @RestControllerAdvice
 @SuppressWarnings("unused")

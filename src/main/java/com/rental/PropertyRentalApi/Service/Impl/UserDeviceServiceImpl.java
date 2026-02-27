@@ -17,6 +17,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@SuppressWarnings("unused")
 public class UserDeviceServiceImpl implements UserDeviceService {
 
     private final UserDeviceRepository userDeviceRepository;

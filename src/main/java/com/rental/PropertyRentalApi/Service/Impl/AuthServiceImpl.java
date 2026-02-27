@@ -215,7 +215,7 @@ public class AuthServiceImpl implements AuthService {
         // Track device (AUTO-LOGIN)
         // ============================
         try {
-            deviceTrackingService.trackUserDevice(savedUser, httpRequest);
+            UserDeviceResponse userDeviceResponse = deviceTrackingService.trackUserDevice(savedUser, httpRequest);
         } catch (Exception e) {
             log.warn("Device tracking failed during register for user {}", savedUser.getId(), e);
         }
@@ -318,7 +318,7 @@ public class AuthServiceImpl implements AuthService {
         // Track device login
         // ============================
         try {
-            deviceTrackingService.trackUserDevice(user, httpRequest);
+            UserDeviceResponse userDeviceResponse = deviceTrackingService.trackUserDevice(user, httpRequest);
         } catch (Exception e) {
             log.warn("Device tracking failed for user {}", user.getId(), e);
         }

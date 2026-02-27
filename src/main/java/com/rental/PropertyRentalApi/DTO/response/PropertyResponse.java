@@ -15,15 +15,8 @@ public class PropertyResponse {
     private BigDecimal electricityCost;
     private BigDecimal waterCost;
 
-<<<<<<< HEAD
     private CategoryResponse category;
-    private UserResponse createdBy;
     private List<String> images;
-=======
-    private String locationName;
-    private String categoryName;
     private UserResponse createdBy;
-    private List<String> images;
     private Integer favoriteCount;
->>>>>>> e4594a1 (add image favorite)
 }

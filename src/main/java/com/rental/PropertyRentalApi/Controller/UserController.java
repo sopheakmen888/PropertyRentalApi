@@ -100,6 +100,9 @@ public class UserController {
         );
     }
 
+    // =====================
+    // GET AUTHENTICATED USER
+    // =====================
     @GetMapping("/me")
     public ApiResponse<UserResponse> getMyProfile() {
 
@@ -111,5 +114,13 @@ public class UserController {
                 "Get user info data successfully.",
                 userData
         );
+    }
+
+    // =====================
+    // UPDATE AUTHENTICATED USER PROFILE
+    // =====================
+    @PutMapping("/me/update-profile")
+    public ApiResponse<UserResponse> updateProfile() {
+        return null;
     }
 }
