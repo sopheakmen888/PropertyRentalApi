@@ -6,15 +6,11 @@ import jakarta.validation.constraints.Positive;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 @Data
 public class PropertyUpdateRequest {
 
-<<<<<<< HEAD
     @NotBlank(message = "Title is required")
-=======
->>>>>>> e4594a1 (add image favorite)
     private String title;
 
     @NotBlank(message = "Description is required")
@@ -29,12 +25,6 @@ public class PropertyUpdateRequest {
 
     private BigDecimal electricityCost;
     private BigDecimal waterCost;
-<<<<<<< HEAD
 
     private String categoryName;
-=======
-    private Long locationId;
-    private Long categoryId;
-    private List<String> images;
->>>>>>> e4594a1 (add image favorite)
 }
