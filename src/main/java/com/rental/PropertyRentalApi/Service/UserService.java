@@ -8,7 +8,6 @@ import com.rental.PropertyRentalApi.Entity.Users;
 
 public interface UserService {
     PaginatedResponse<UserResponse> getAll(int page, int size);
-//    List<UserResponse> getAll();
 
     UserResponse getById(Long id);
     UserResponse create(UserCreateRequest request);
