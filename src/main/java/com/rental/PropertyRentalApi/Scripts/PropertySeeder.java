@@ -21,7 +21,7 @@ import static com.rental.PropertyRentalApi.Exception.ErrorsExceptionFactory.notF
 @Slf4j
 @Component
 @RequiredArgsConstructor
-@Order(4)
+@Order(7)
 public class PropertySeeder implements CommandLineRunner {
 
     private final PropertyRepository propertyRepository;

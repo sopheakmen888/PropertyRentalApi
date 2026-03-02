@@ -39,51 +39,6 @@ public class PropertyServiceImpl implements PropertyService {
     private final AuthUtil authUtil;
     private final HelperFunction helperFunction;
 
-
-    // ==============
-    // SEARCH PROPERTIES BY MULTIPLE FILTERS
-    // ==============
-    @Override
-    public PaginatedResponse<PropertyResponse> searchProperties(
-            String title,
-            String description,
-            String categoryName,
-            String address,
-            String propertyType,
-            int page, int size
-    ) {
-
-        Pageable pageable = PageRequest.of(page, size);
-
-        Specification<Properties> spec =
-                PropertySpecification.search(
-                        title,
-                        description,
-                        categoryName,
-                        address,
-                        propertyType
-                );
-
-        Page<Properties> propertyPage =
-                propertyRepository.findAll(spec, pageable);
-
-        List<PropertyResponse> propertyResponses = propertyPage.getContent()
-                .stream()
-                .map(propertyMapper::toPropertyResponse)
-                .toList();
-
-        PaginatedResponse.PaginationMeta paginationMeta = new PaginatedResponse.PaginationMeta(
-                propertyPage.getNumber() + 1,
-                propertyPage.getSize(),
-                propertyPage.getTotalElements(),
-                propertyPage.getTotalPages(),
-                propertyPage.hasNext(),
-                propertyPage.hasPrevious()
-        );
-
-        return new PaginatedResponse<>(propertyResponses, paginationMeta);
-    }
-
     // ==============
     // GET ALL WITH PAGINATION
     // ==============
@@ -296,13 +251,53 @@ public class PropertyServiceImpl implements PropertyService {
         favoritesRepository.delete(favorite);
     }
 
-
+    // ==============
+    // SEARCH PROPERTIES BY MULTIPLE FILTERS
+    // ==============
     @Override
-    public List<PropertyResponse> filterProperties(Long provinceId, Long districtId, Long communeId) {
-        List<Properties> filteredProperties = propertyRepository.filterProperties(provinceId, districtId, communeId);
-        return filteredProperties.stream()
+    public PaginatedResponse<PropertyResponse> searchProperties(
+            String title,
+            String description,
+            String categoryName,
+            String address,
+            String propertyType,
+            int page, int size,
+            Long provinceId,
+            Long districtId,
+            Long communeId
+    ) {
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        Specification<Properties> spec =
+                PropertySpecification.search(
+                        title,
+                        description,
+                        categoryName,
+                        address,
+                        propertyType,
+                        provinceId,
+                        districtId,
+                        communeId
+                );
+
+        Page<Properties> propertyPage =
+                propertyRepository.findAll(spec, pageable);
+
+        List<PropertyResponse> propertyResponses = propertyPage.getContent()
+                .stream()
                 .map(propertyMapper::toPropertyResponse)
                 .toList();
-    
+
+        PaginatedResponse.PaginationMeta paginationMeta = new PaginatedResponse.PaginationMeta(
+                propertyPage.getNumber() + 1,
+                propertyPage.getSize(),
+                propertyPage.getTotalElements(),
+                propertyPage.getTotalPages(),
+                propertyPage.hasNext(),
+                propertyPage.hasPrevious()
+        );
+
+        return new PaginatedResponse<>(propertyResponses, paginationMeta);
     }
 }
