@@ -30,9 +30,6 @@ public class Users implements UserDetails {
     @Column(name = "username", unique = true, nullable = false)
     private String username;
 
-//    @Column(name = "date_of_birth")
-//    private String dob;
-
     @Column(name = "email", unique = true, nullable = false)
     private String email;
 
@@ -41,12 +38,6 @@ public class Users implements UserDetails {
 
     @Column(name = "phone", unique = true)
     private String phone;
-
-//    @Column(name = "profile_image_url")
-//    private String profileImageUrl;
-//
-//    @Column(name = "profile_image_public_id")
-//    private String profileImagePublicId;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private UsersProfile profile;
