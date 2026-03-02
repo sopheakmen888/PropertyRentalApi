@@ -19,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Sort;
 
 import java.util.List;
 
@@ -264,10 +265,20 @@ public class PropertyServiceImpl implements PropertyService {
             int page, int size,
             Long provinceId,
             Long districtId,
-            Long communeId
+            Long communeId,
+            String sortBy,
+            String sortDir
     ) {
 
-        Pageable pageable = PageRequest.of(page, size);
+        Sort sort = Sort.unsorted();
+
+        if (sortBy != null && !sortBy.isEmpty()) {
+            sort = "desc".equalsIgnoreCase(sortDir)
+                    ? Sort.by(sortBy).descending()
+                    : Sort.by(sortBy).ascending();
+        }
+
+        Pageable pageable = PageRequest.of(page, size, sort);
 
         Specification<Properties> spec =
                 PropertySpecification.search(

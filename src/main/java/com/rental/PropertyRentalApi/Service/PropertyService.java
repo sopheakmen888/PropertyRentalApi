@@ -34,7 +34,9 @@ public interface PropertyService {
             int page, int size,
             Long provinceId,
             Long districtId,
-            Long communeId
+            Long communeId,
+            String sortBy,
+            String sortDir
     );
 
 //    List<PropertyResponse> filterProperties(Long provinceId, Long districtId, Long communeId);

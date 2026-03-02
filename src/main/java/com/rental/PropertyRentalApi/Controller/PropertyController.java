@@ -175,7 +175,10 @@ public class PropertyController {
 
             @RequestParam(required = false) Long provinceId,
             @RequestParam(required = false) Long districtId,
-            @RequestParam(required = false) Long communeId
+            @RequestParam(required = false) Long communeId,
+
+            @RequestParam(required = false) String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDir
     ) {
         PaginatedResponse<PropertyResponse> paginatedProperties =
                 propertyService.searchProperties(
@@ -187,7 +190,8 @@ public class PropertyController {
                         page, size,
                         provinceId,
                         districtId,
-                        communeId
+                        communeId,
+                        sortBy, sortDir
                 );
 
         String message =
