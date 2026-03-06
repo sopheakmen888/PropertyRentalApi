@@ -294,8 +294,8 @@ public class AuthServiceImpl implements AuthService {
 
 //        Thread.sleep(500);
 
-        Users user = userRepository.findByEmail(request.getLogin())
-                .or(() -> userRepository.findByUsername(request.getLogin()))
+        Users user = userRepository.findByEmail(request.getEmail_or_username())
+                .or(() -> userRepository.findByUsername(request.getEmail_or_username()))
                 .orElseThrow(() -> notFound("User not found."));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
