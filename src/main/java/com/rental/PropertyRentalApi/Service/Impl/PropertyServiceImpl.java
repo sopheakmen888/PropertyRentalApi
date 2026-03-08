@@ -114,6 +114,13 @@ public class PropertyServiceImpl implements PropertyService {
         Properties property = propertyMapper.toPropertyEntity(request);
 
         // ==============
+        // SET AVAILABILITY
+        // ==============
+        property.setAvailable(
+                request.getAvailable() != null ? request.getAvailable() : true
+        );
+
+        // ==============
         // SET CREATED BY USER
         // ==============
         property.setCreatedBy(currentUser);
@@ -266,6 +273,7 @@ public class PropertyServiceImpl implements PropertyService {
             Long provinceId,
             Long districtId,
             Long communeId,
+            Boolean available,
             String sortBy,
             String sortDir
     ) {
@@ -289,7 +297,8 @@ public class PropertyServiceImpl implements PropertyService {
                         propertyType,
                         provinceId,
                         districtId,
-                        communeId
+                        communeId,
+                        available
                 );
 
         Page<Properties> propertyPage =

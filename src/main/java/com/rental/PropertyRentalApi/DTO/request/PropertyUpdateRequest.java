@@ -25,6 +25,7 @@ public class PropertyUpdateRequest {
 
     private BigDecimal electricityCost;
     private BigDecimal waterCost;
+    private Boolean available;
 
     private String categoryName;
 }

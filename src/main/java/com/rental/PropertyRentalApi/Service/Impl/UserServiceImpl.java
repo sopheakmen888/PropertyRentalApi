@@ -118,7 +118,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponse updateProfile(Long userId, UserUpdateRequest request) {
-        return null;
+    public UserResponse updateUserProfile(UserUpdateRequest request) {
+
+        // Get authenticated user
+        Users authUser = authUtil.getAuthenticatedUser();
+
+        // Map update fields
+        userMapper.updateUserEntity(request, authUser);
+
+        // Save
+        Users updatedUser = userRepository.save(authUser);
+
+        return userMapper.toUserResponse(updatedUser);
     }
 }

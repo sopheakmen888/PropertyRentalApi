@@ -17,7 +17,8 @@ public class PropertySpecification {
             String propertyType,
             Long provinceId,
             Long districtId,
-            Long communeId
+            Long communeId,
+            Boolean available
     ) {
 
         return (root, query, cb) -> {
@@ -102,6 +103,12 @@ public class PropertySpecification {
                                         .get("id"),
                                 communeId
                         )
+                );
+            }
+
+            if (available != null) {
+                predicates.add(
+                        cb.equal(root.get("available"), available)
                 );
             }
 

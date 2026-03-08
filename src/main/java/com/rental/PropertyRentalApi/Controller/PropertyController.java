@@ -176,6 +176,7 @@ public class PropertyController {
             @RequestParam(required = false) Long provinceId,
             @RequestParam(required = false) Long districtId,
             @RequestParam(required = false) Long communeId,
+            @RequestParam(required = false) Boolean available,
 
             @RequestParam(required = false) String sortBy,
             @RequestParam(defaultValue = "asc") String sortDir
@@ -191,6 +192,7 @@ public class PropertyController {
                         provinceId,
                         districtId,
                         communeId,
+                        available,
                         sortBy, sortDir
                 );
 

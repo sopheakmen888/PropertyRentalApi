@@ -35,6 +35,7 @@ public interface PropertyService {
             Long provinceId,
             Long districtId,
             Long communeId,
+            Boolean available,
             String sortBy,
             String sortDir
     );

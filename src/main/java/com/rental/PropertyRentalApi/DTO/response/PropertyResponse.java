@@ -14,9 +14,9 @@ public class PropertyResponse {
     private BigDecimal price;
     private BigDecimal electricityCost;
     private BigDecimal waterCost;
+    private Boolean available;
 
     private CategoryResponse category;
-    private List<String> images;
     private UserResponse createdBy;
-    private Integer favoriteCount;
+    private List<String> images;
 }
