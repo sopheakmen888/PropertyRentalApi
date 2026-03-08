@@ -5,11 +5,12 @@ import com.rental.PropertyRentalApi.DTO.request.UserUpdateRequest;
 import com.rental.PropertyRentalApi.DTO.response.PaginatedResponse;
 import com.rental.PropertyRentalApi.DTO.response.UserResponse;
 import com.rental.PropertyRentalApi.Entity.Users;
-import com.rental.PropertyRentalApi.Mapper.MapperFunction;
+import com.rental.PropertyRentalApi.Mapper.UserMapper;
 import com.rental.PropertyRentalApi.Service.UserService;
 import com.rental.PropertyRentalApi.Repository.UserRepository;
-import com.rental.PropertyRentalApi.Utils.HelperFunction;
+import com.rental.PropertyRentalApi.Utils.AuthUtil;
 
+import com.rental.PropertyRentalApi.Utils.UserValidatorUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,8 +30,9 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final HelperFunction helperFunction;
-    private final MapperFunction mapperFunction;
+    private final UserValidatorUtil userValidator;
+    private final AuthUtil authUtil;
+    private final UserMapper userMapper;
 
     @Override
     public PaginatedResponse<UserResponse> getAll(int page, int size) {
@@ -40,7 +42,7 @@ public class UserServiceImpl implements UserService {
 
         List<UserResponse> userResponses = userPage.getContent()
                 .stream()
-                .map(mapperFunction::toUserResponse)
+                .map(userMapper::toUserResponse)
                 .toList();
 
         PaginatedResponse.PaginationMeta paginationMeta =
@@ -63,20 +65,20 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> notFound("User not found"));
 
 
-        return mapperFunction.toUserResponse(user);
+        return userMapper.toUserResponse(user);
     }
 
     @Override
     public UserResponse create(UserCreateRequest request) {
 
-        helperFunction.validateCreate(request);
+        userValidator.validateCreate(request);
 
-        Users user = mapperFunction.toUserEntity(request);
+        Users user = userMapper.toUserEntity(request);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
 
         Users savedUser = userRepository.save(user);
 
-        return mapperFunction.toUserResponse(savedUser);
+        return userMapper.toUserResponse(savedUser);
     }
 
     @Override
@@ -84,14 +86,14 @@ public class UserServiceImpl implements UserService {
 
         Users user = userRepository.findById(id)
                 .orElseThrow(() -> notFound("User not found"));
-//        Users user = userRepository.findByIdWithFavorite(id)
-//                .orElseThrow(() -> notFound("User not found"));
 
-        mapperFunction.updateUserEntity(request, user);
+        userValidator.validateUpdate(request);
+
+        userMapper.updateUserEntity(request, user);
 
         Users updatedUser = userRepository.save(user);
 
-        return mapperFunction.toUserResponse(updatedUser);
+        return userMapper.toUserResponse(updatedUser);
     }
 
     @Override
@@ -106,12 +108,27 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponse userProfileInfo() {
 
-        Users authUser = helperFunction.getAuthenticatedUser();
+        Users authUser = authUtil.getAuthenticatedUser();
 
         Users currentUserData = userRepository
                 .findById(authUser.getId())
                 .orElseThrow(() -> notFound("User not found."));
 
-        return mapperFunction.toUserResponse(currentUserData);
+        return userMapper.toUserResponse(currentUserData);
+    }
+
+    @Override
+    public UserResponse updateUserProfile(UserUpdateRequest request) {
+
+        // Get authenticated user
+        Users authUser = authUtil.getAuthenticatedUser();
+
+        // Map update fields
+        userMapper.updateUserEntity(request, authUser);
+
+        // Save
+        Users updatedUser = userRepository.save(authUser);
+
+        return userMapper.toUserResponse(updatedUser);
     }
 }

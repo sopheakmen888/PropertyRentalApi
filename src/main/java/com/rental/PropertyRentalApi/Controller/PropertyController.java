@@ -6,11 +6,11 @@ import com.rental.PropertyRentalApi.DTO.request.PropertyUpdateRequest;
 import com.rental.PropertyRentalApi.DTO.response.ApiResponse;
 import com.rental.PropertyRentalApi.DTO.response.PaginatedResponse;
 import com.rental.PropertyRentalApi.DTO.response.PropertyResponse;
-import com.rental.PropertyRentalApi.Service.Jwt.JwtService;
 import com.rental.PropertyRentalApi.Service.PropertyService;
-import com.rental.PropertyRentalApi.Utils.HelperFunction;
+import com.rental.PropertyRentalApi.Utils.AuthUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,11 +18,12 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
+@SuppressWarnings("unused")
 public class PropertyController {
 
     private final PropertyService propertyService;
-    private final HelperFunction helperFunction;
-
+    private final AuthUtil authUtil;
+    
     // ==============
     // GET ALL WITH PAGINATION
     // ==============
@@ -103,7 +104,7 @@ public class PropertyController {
         propertyService.delete(id);
 
         return new ApiResponse<>(
-                204,
+                200,
                 true,
                 "Property deleted successfully."
         );
@@ -129,12 +130,12 @@ public class PropertyController {
     // ============================
     // ADD FAVORITE
     // ============================
-    @PostMapping("/properties/favorite/{id}")
-    public ApiResponse<Void> addFavorite(@PathVariable Long id) {
+    @PostMapping("/properties/{id}/favorite")
+    public ApiResponse<Void> addFavorite(@PathVariable Long propertyId) {
 
-        Users currentUser = helperFunction.getAuthenticatedUser();
+        Users currentUser = authUtil.getAuthenticatedUser();
 
-        propertyService.addFavorite(id, currentUser.getId());
+        propertyService.addFavorite(propertyId, currentUser.getId());
 
         return new ApiResponse<>(
                 200,
@@ -147,15 +148,64 @@ public class PropertyController {
     // REMOVE FAVORITE
     // ============================
     @DeleteMapping("/properties/{id}/favorite")
-    public ApiResponse<Void> removeFavorite(@PathVariable Long id) {
-        Users currentUser = helperFunction.getAuthenticatedUser()
+    public ApiResponse<Void> removeFavorite(@PathVariable Long propertyId) {
+        Users currentUser = authUtil.getAuthenticatedUser()
                 ;
-        propertyService.removeFavorite(id, currentUser.getId());
+        propertyService.removeFavorite(propertyId, currentUser.getId());
 
         return new ApiResponse<>(
                 200,
                 true,
                 "Property removed from favorites."
+        );
+    }
+
+    // ==============
+    // SEARCH PROPERTIES BY MULTIPLE FILTERS
+    // ==============
+    @GetMapping("/public/properties/search")
+    public ApiResponse<PaginatedResponse<PropertyResponse>> searchProperties(
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) String description,
+            @RequestParam(required = false) String categoryName,
+            @RequestParam(required = false) String address,
+            @RequestParam(required = false) String propertyType,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+
+            @RequestParam(required = false) Long provinceId,
+            @RequestParam(required = false) Long districtId,
+            @RequestParam(required = false) Long communeId,
+            @RequestParam(required = false) Boolean available,
+
+            @RequestParam(required = false) String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDir
+    ) {
+        PaginatedResponse<PropertyResponse> paginatedProperties =
+                propertyService.searchProperties(
+                        title,
+                        description,
+                        categoryName,
+                        address,
+                        propertyType,
+                        page, size,
+                        provinceId,
+                        districtId,
+                        communeId,
+                        available,
+                        sortBy, sortDir
+                );
+
+        String message =
+                paginatedProperties.getItems().isEmpty()
+                        ? "No properties found."
+                        : "Properties retrieved successfully.";
+
+        return new ApiResponse<>(
+                200,
+                true,
+                message,
+                paginatedProperties
         );
     }
 }

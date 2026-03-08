@@ -19,7 +19,10 @@ public class UploadsImages {
     @Column(name = "urls")
     private String urls;
 
-    @ManyToOne
-    @JoinColumn(name = "property_id", nullable = false)
+    @Column(name = "public_id")
+    private String publicId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "property_id")
     private Properties property;
 }

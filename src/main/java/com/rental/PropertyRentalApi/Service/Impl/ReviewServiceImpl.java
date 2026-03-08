@@ -6,7 +6,7 @@ import com.rental.PropertyRentalApi.DTO.response.ReviewResponse;
 import com.rental.PropertyRentalApi.Entity.Properties;
 import com.rental.PropertyRentalApi.Entity.Reviews;
 import com.rental.PropertyRentalApi.Entity.Users;
-import com.rental.PropertyRentalApi.Mapper.MapperFunction;
+import com.rental.PropertyRentalApi.Mapper.ReviewMapper;
 import com.rental.PropertyRentalApi.Repository.PropertyRepository;
 import com.rental.PropertyRentalApi.Repository.ReviewRepository;
 import com.rental.PropertyRentalApi.Service.Jwt.JwtService;
@@ -22,12 +22,13 @@ import static com.rental.PropertyRentalApi.Exception.ErrorsExceptionFactory.*;
 
 @Service
 @RequiredArgsConstructor
+@SuppressWarnings("unused")
 public class ReviewServiceImpl implements ReviewService {
 
     private final ReviewRepository reviewRepository;
     private final PropertyRepository propertyRepository;
     private final JwtService jwtService;
-    private final MapperFunction mapper;
+    private final ReviewMapper reviewMapper;
 
     // ======================
     // CREATE REVIEW
@@ -57,12 +58,12 @@ public class ReviewServiceImpl implements ReviewService {
         }
 
         // Map request to entity
-        Reviews review = mapper.toReviewEntity(request);
+        Reviews review = reviewMapper.toReviewEntity(request);
         review.setUser(currentUser);
         review.setProperty(property);
 
         Reviews saved = reviewRepository.save(review);
-        return mapper.toReviewResponse(saved);
+        return reviewMapper.toReviewResponse(saved);
     }
 
     // ======================
@@ -79,10 +80,10 @@ public class ReviewServiceImpl implements ReviewService {
             throw forbidden("You can only update your own reviews.");
         }
 
-        mapper.updateReviewEntity(request, review);
+        reviewMapper.updateReviewEntity(request, review);
         Reviews updated = reviewRepository.save(review);
 
-        return mapper.toReviewResponse(updated);
+        return reviewMapper.toReviewResponse(updated);
     }
 
     // ======================
@@ -113,7 +114,7 @@ public class ReviewServiceImpl implements ReviewService {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
         Page<Reviews> reviews = reviewRepository.findAllByProperty(property, pageable);
 
-        return reviews.map(mapper::toReviewResponse);
+        return reviews.map(reviewMapper::toReviewResponse);
     }
 
     // ======================
@@ -126,7 +127,7 @@ public class ReviewServiceImpl implements ReviewService {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
         Page<Reviews> reviews = reviewRepository.findAllByUser(currentUser, pageable);
 
-        return reviews.map(mapper::toReviewResponse);
+        return reviews.map(reviewMapper::toReviewResponse);
     }
 
     // ======================
@@ -137,6 +138,6 @@ public class ReviewServiceImpl implements ReviewService {
         Reviews review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> notFound("Review not found"));
 
-        return mapper.toReviewResponse(review);
+        return reviewMapper.toReviewResponse(review);
     }
 }

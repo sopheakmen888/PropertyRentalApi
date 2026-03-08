@@ -6,4 +6,8 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface UploadsImagesRepository extends JpaRepository<UploadsImages, Long> {
+
+//    Optional<UploadsImages> findByUserAndOwnerType(
+//            Users user
+//    );
 }

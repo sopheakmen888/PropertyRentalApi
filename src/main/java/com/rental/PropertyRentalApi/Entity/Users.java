@@ -6,7 +6,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -30,9 +30,6 @@ public class Users implements UserDetails {
     @Column(name = "username", unique = true, nullable = false)
     private String username;
 
-    @Column(name = "date_of_birth")
-    private String dob;
-
     @Column(name = "email", unique = true, nullable = false)
     private String email;
 
@@ -42,8 +39,8 @@ public class Users implements UserDetails {
     @Column(name = "phone", unique = true)
     private String phone;
 
-//    @Column(name = "profile_photo")
-//    private String profilePhoto;
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private UsersProfile profile;
 
     @OneToMany(mappedBy = "user")
     private List<Favorites> favorites;
@@ -68,16 +65,16 @@ public class Users implements UserDetails {
     private boolean enabled = true;
 
     @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
     @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
+    private Instant updatedAt;
 
-    @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
-    }
+//    @PrePersist
+//    protected void onCreate() {
+//        createdAt = Instant.now();
+//        updatedAt = Instant.now();
+//    }
 
 
     // =========================
