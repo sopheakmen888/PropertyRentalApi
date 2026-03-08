@@ -39,6 +39,4 @@ public interface PropertyService {
             String sortBy,
             String sortDir
     );
-
-//    List<PropertyResponse> filterProperties(Long provinceId, Long districtId, Long communeId);
 }

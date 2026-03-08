@@ -42,7 +42,7 @@ public class PropertyServiceImpl implements PropertyService {
 
     // ==============
     // GET ALL WITH PAGINATION
-    // ==============
+    // ==============s
     @Override
     public PaginatedResponse<PropertyResponse> getAll(int page, int size) {
         Pageable pageable = PageRequest.of(
@@ -52,7 +52,7 @@ public class PropertyServiceImpl implements PropertyService {
 
         // Fetch paginated data
         Page<Properties> propertyPage = propertyRepository.findAll(pageable);
-
+ 
         // Check if page is empty
         if (propertyPage.isEmpty()) {
             throw notFound("Properties not found.");
