@@ -5,9 +5,15 @@ import com.rental.PropertyRentalApi.DTO.request.UserUpdateRequest;
 import com.rental.PropertyRentalApi.DTO.response.ApiResponse;
 import com.rental.PropertyRentalApi.DTO.response.PaginatedResponse;
 import com.rental.PropertyRentalApi.DTO.response.UserResponse;
+import com.rental.PropertyRentalApi.Entity.Users;
+import com.rental.PropertyRentalApi.Mapper.UserMapper;
+import com.rental.PropertyRentalApi.Repository.UserRepository;
 import com.rental.PropertyRentalApi.Service.UserService;
+import com.rental.PropertyRentalApi.Utils.AuthUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import static com.rental.PropertyRentalApi.Exception.ErrorsExceptionFactory.notFound;
 
 @RestController
 @RequiredArgsConstructor
@@ -16,6 +22,9 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
+    private final AuthUtil authUtil;
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
     // ==============
     // GET ALL USERS WITH PAGINATION
@@ -121,7 +130,17 @@ public class UserController {
     // UPDATE AUTHENTICATED USER PROFILE
     // =====================
     @PutMapping("/me/update-profile")
-    public ApiResponse<UserResponse> updateProfile() {
-        return null;
+    public ApiResponse<UserResponse> updateProfile(
+            @RequestBody UserUpdateRequest request
+    ) {
+
+        UserResponse response = userService.updateUserProfile(request);
+
+        return new ApiResponse<>(
+                200,
+                true,
+                "Profile updated successfully.",
+                response
+        );
     }
 }

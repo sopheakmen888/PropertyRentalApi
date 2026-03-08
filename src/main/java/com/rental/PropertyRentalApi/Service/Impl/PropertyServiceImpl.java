@@ -9,8 +9,10 @@ import com.rental.PropertyRentalApi.Mapper.PropertyMapper;
 import com.rental.PropertyRentalApi.Repository.*;
 import com.rental.PropertyRentalApi.Service.Jwt.JwtService;
 import com.rental.PropertyRentalApi.Service.PropertyService;
+import com.rental.PropertyRentalApi.Specification.PropertySpecification;
 import com.rental.PropertyRentalApi.Utils.AuthUtil;
 import com.rental.PropertyRentalApi.Utils.HelperFunction;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -110,6 +112,13 @@ public class PropertyServiceImpl implements PropertyService {
         // MAP REQUEST TO ENTITY
         // ==============
         Properties property = propertyMapper.toPropertyEntity(request);
+
+        // ==============
+        // SET AVAILABILITY
+        // ==============
+        property.setAvailable(
+                request.getAvailable() != null ? request.getAvailable() : true
+        );
 
         // ==============
         // SET CREATED BY USER
@@ -264,6 +273,7 @@ public class PropertyServiceImpl implements PropertyService {
             Long provinceId,
             Long districtId,
             Long communeId,
+            Boolean available,
             String sortBy,
             String sortDir
     ) {
@@ -287,7 +297,8 @@ public class PropertyServiceImpl implements PropertyService {
                         propertyType,
                         provinceId,
                         districtId,
-                        communeId
+                        communeId,
+                        available
                 );
 
         Page<Properties> propertyPage =

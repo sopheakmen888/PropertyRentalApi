@@ -14,28 +14,17 @@ public class PropertySpecification {
             String description,
             String categoryName,
             String address,
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 5fc596e (enhance search with filter by commune districts province...)
             String propertyType,
             Long provinceId,
             Long districtId,
-            Long communeId
-<<<<<<< HEAD
-=======
-            String propertyType
->>>>>>> 2887ad5 (fix search feature and add update authenticated user profile)
-=======
->>>>>>> 5fc596e (enhance search with filter by commune districts province...)
+            Long communeId,
+            Boolean available
     ) {
 
         return (root, query, cb) -> {
 
             List<Predicate> predicates = new ArrayList<>();
 
-<<<<<<< HEAD
-<<<<<<< HEAD
             // ======================
             // TEXT SEARCH
             // ======================
@@ -46,32 +35,10 @@ public class PropertySpecification {
                                 "%" + title.toLowerCase() + "%"
                         )
                 );
-=======
-            if (title != null && !title.isBlank()) {
-                predicates.add(
-                        cb.like(cb.lower(root.get("title")),
-                                "%" + title.toLowerCase() + "%"));
->>>>>>> 2887ad5 (fix search feature and add update authenticated user profile)
-=======
-            // ======================
-            // TEXT SEARCH
-            // ======================
-            if (title != null && !title.isBlank()) {
-                predicates.add(
-                        cb.like(
-                                cb.lower(root.get("title")),
-                                "%" + title.toLowerCase() + "%"
-                        )
-                );
->>>>>>> 5fc596e (enhance search with filter by commune districts province...)
             }
 
             if (description != null && !description.isBlank()) {
                 predicates.add(
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 5fc596e (enhance search with filter by commune districts province...)
                         cb.like(
                                 cb.lower(root.get("description")),
                                 "%" + description.toLowerCase() + "%"
@@ -86,41 +53,19 @@ public class PropertySpecification {
                                 "%" + categoryName.toLowerCase() + "%"
                         )
                 );
-<<<<<<< HEAD
-=======
-                        cb.like(cb.lower(root.get("description")),
-                                "%" + description.toLowerCase() + "%"));
->>>>>>> 2887ad5 (fix search feature and add update authenticated user profile)
-=======
->>>>>>> 5fc596e (enhance search with filter by commune districts province...)
             }
 
             if (address != null && !address.isBlank()) {
                 predicates.add(
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 5fc596e (enhance search with filter by commune districts province...)
                         cb.like(
                                 cb.lower(root.get("address")),
                                 "%" + address.toLowerCase() + "%"
                         )
                 );
-<<<<<<< HEAD
-=======
-                        cb.like(cb.lower(root.get("address")),
-                                "%" + address.toLowerCase() + "%"));
->>>>>>> 2887ad5 (fix search feature and add update authenticated user profile)
-=======
->>>>>>> 5fc596e (enhance search with filter by commune districts province...)
             }
 
             if (propertyType != null && !propertyType.isBlank()) {
                 predicates.add(
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 5fc596e (enhance search with filter by commune districts province...)
                         cb.equal(root.get("propertyType"), propertyType)
                 );
             }
@@ -159,12 +104,12 @@ public class PropertySpecification {
                                 communeId
                         )
                 );
-<<<<<<< HEAD
-=======
-                        cb.equal(root.get("propertyType"), propertyType));
->>>>>>> 2887ad5 (fix search feature and add update authenticated user profile)
-=======
->>>>>>> 5fc596e (enhance search with filter by commune districts province...)
+            }
+
+            if (available != null) {
+                predicates.add(
+                        cb.equal(root.get("available"), available)
+                );
             }
 
             return cb.and(predicates.toArray(new Predicate[0]));
