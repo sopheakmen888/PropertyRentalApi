@@ -12,7 +12,8 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface PropertyRepository extends JpaRepository<Properties, Long> {
+public interface PropertyRepository extends JpaRepository<Properties, Long>,
+        JpaSpecificationExecutor<Properties> {
 
     boolean existsByTitle(String title);
 

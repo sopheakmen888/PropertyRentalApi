@@ -177,8 +177,10 @@ public class JwtService {
     public Users getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if (authentication == null || !authentication.isAuthenticated()) {
-            throw unauthorized("User not Authenticated");
+        if (authentication == null ||
+                !authentication.isAuthenticated() ||
+                authentication.getPrincipal().equals("anonymousUser")) {
+            throw unauthorized("User not authenticated");
         }
 
         return (Users) authentication.getPrincipal();
