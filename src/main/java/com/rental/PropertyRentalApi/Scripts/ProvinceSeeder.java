@@ -1,6 +1,5 @@
 package com.rental.PropertyRentalApi.Scripts;
 
-import com.rental.PropertyRentalApi.Entity.Categories;
 import com.rental.PropertyRentalApi.Entity.Provinces;
 import com.rental.PropertyRentalApi.Repository.ProvinceRepository;
 import lombok.RequiredArgsConstructor;

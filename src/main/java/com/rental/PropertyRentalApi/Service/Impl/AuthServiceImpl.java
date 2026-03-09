@@ -1,8 +1,8 @@
 package com.rental.PropertyRentalApi.Service.Impl;
 
+import com.rental.PropertyRentalApi.DTO.request.AuthRequest;
 import com.rental.PropertyRentalApi.DTO.request.RegisterRequest;
 import com.rental.PropertyRentalApi.DTO.response.*;
-import com.rental.PropertyRentalApi.DTO.request.AuthRequest;
 import com.rental.PropertyRentalApi.Entity.RefreshToken;
 import com.rental.PropertyRentalApi.Entity.Roles;
 import com.rental.PropertyRentalApi.Entity.Users;
@@ -15,13 +15,10 @@ import com.rental.PropertyRentalApi.Service.DeviceTrackingService;
 import com.rental.PropertyRentalApi.Service.Jwt.JwtService;
 import com.rental.PropertyRentalApi.Service.UploadService;
 import com.rental.PropertyRentalApi.Utils.CookieHelper;
-
-
 import com.rental.PropertyRentalApi.Utils.HelperFunction;
 import com.rental.PropertyRentalApi.Utils.UserValidatorUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
