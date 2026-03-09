@@ -6,7 +6,6 @@ import com.rental.PropertyRentalApi.DTO.request.AuthRequest;
 import com.rental.PropertyRentalApi.Entity.RefreshToken;
 import com.rental.PropertyRentalApi.Entity.Roles;
 import com.rental.PropertyRentalApi.Entity.Users;
-import com.rental.PropertyRentalApi.Mapper.MapperConfiguration;
 import com.rental.PropertyRentalApi.Mapper.UserMapper;
 import com.rental.PropertyRentalApi.Repository.RefreshTokenRepository;
 import com.rental.PropertyRentalApi.Repository.RoleRepository;
@@ -216,7 +215,7 @@ public class AuthServiceImpl implements AuthService {
         // Track device (AUTO-LOGIN)
         // ============================
         try {
-            deviceTrackingService.trackUserDevice(savedUser, httpRequest);
+            UserDeviceResponse userDeviceResponse = deviceTrackingService.trackUserDevice(savedUser, httpRequest);
         } catch (Exception e) {
             log.warn("Device tracking failed during register for user {}", savedUser.getId(), e);
         }
@@ -294,8 +293,8 @@ public class AuthServiceImpl implements AuthService {
 
 //        Thread.sleep(500);
 
-        Users user = userRepository.findByEmail(request.getLogin())
-                .or(() -> userRepository.findByUsername(request.getLogin()))
+        Users user = userRepository.findByEmail(request.getEmail_or_username())
+                .or(() -> userRepository.findByUsername(request.getEmail_or_username()))
                 .orElseThrow(() -> notFound("User not found."));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
@@ -319,7 +318,7 @@ public class AuthServiceImpl implements AuthService {
         // Track device login
         // ============================
         try {
-            deviceTrackingService.trackUserDevice(user, httpRequest);
+            UserDeviceResponse userDeviceResponse = deviceTrackingService.trackUserDevice(user, httpRequest);
         } catch (Exception e) {
             log.warn("Device tracking failed for user {}", user.getId(), e);
         }
