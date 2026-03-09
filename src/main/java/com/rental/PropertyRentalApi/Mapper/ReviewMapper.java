@@ -29,20 +29,4 @@ public interface ReviewMapper {
     @Mapping(target = "propertyTitle", source = "property.title")
     ReviewResponse toReviewResponse(Reviews reviews);
 
-//    default ReviewResponse toReviewResponse(Reviews review) {
-//        if (review == null) return null;
-//
-//        ReviewResponse response = new ReviewResponse();
-//        response.setId(review.getId());
-//        response.setRating(review.getRating());
-//        response.setComment(review.getComment());
-//        response.setCreatedAt(review.getCreatedAt());
-//        response.setUpdatedAt(review.getUpdatedAt());
-//        response.setUser(userMapper.toUserResponse(review.getUser()));
-//        if (review.getProperty() != null) {
-//            response.setPropertyId(review.getProperty().getId());
-//            response.setPropertyTitle(review.getProperty().getTitle());
-//        }
-//        return response;
-//    }
 }

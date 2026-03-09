@@ -1,21 +1,22 @@
 package com.rental.PropertyRentalApi.Entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
-@Getter
-@Setter
+@Table(name = "provinces")
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "categories")
 @Builder
-public class Categories {
-
+public class Provinces {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "name")
     private String name;
 }

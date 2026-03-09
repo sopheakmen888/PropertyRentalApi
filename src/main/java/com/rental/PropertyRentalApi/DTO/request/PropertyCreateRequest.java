@@ -25,8 +25,9 @@ public class PropertyCreateRequest {
 
     private BigDecimal electricityCost;
     private BigDecimal waterCost;
+    private Boolean available;
 
-//    @NotNull(message = "Category Name is required")
+    //    @NotNull(message = "Category Name is required")
     @NotBlank(message = "Category Name is required")
     private String categoryName;
 

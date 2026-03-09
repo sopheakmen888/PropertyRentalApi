@@ -22,6 +22,7 @@ import static com.rental.PropertyRentalApi.Exception.ErrorsExceptionFactory.*;
 
 @Service
 @RequiredArgsConstructor
+@SuppressWarnings("unused")
 public class ReviewServiceImpl implements ReviewService {
 
     private final ReviewRepository reviewRepository;
