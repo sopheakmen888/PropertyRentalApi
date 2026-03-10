@@ -59,11 +59,20 @@ public class Properties {
     private List<UploadsImages> images;
 
     @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
+    @Column(
+            name = "created_at",
+            nullable = false,
+            updatable = false,
+            insertable = false
+    )
     private Instant createdAt;
 
     @UpdateTimestamp
-    @Column(name = "updated_at", nullable = false)
+    @Column(
+            name = "updated_at",
+            insertable = false,
+            nullable = false
+    )
     private Instant updatedAt;
 
     @Column(nullable = false)
