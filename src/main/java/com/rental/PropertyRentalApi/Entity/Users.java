@@ -2,6 +2,8 @@ package com.rental.PropertyRentalApi.Entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -64,18 +66,13 @@ public class Users implements UserDetails {
     @Column(nullable = false)
     private boolean enabled = true;
 
+    @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
+    @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
-
-//    @PrePersist
-//    protected void onCreate() {
-//        createdAt = Instant.now();
-//        updatedAt = Instant.now();
-//    }
-
 
     // =========================
     // UserDetails Implementation
