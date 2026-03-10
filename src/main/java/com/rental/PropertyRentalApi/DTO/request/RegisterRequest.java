@@ -9,6 +9,10 @@ import java.util.List;
 public class RegisterRequest {
     private String fullname;
     private String username;
+<<<<<<< Updated upstream
+=======
+    private String username;
+>>>>>>> Stashed changes
     private String email;
     private String password;
     private String phone;
