@@ -62,15 +62,13 @@ public class Properties {
     @Column(
             name = "created_at",
             nullable = false,
-            updatable = false,
-            insertable = false
+            updatable = false
     )
     private Instant createdAt;
 
     @UpdateTimestamp
     @Column(
             name = "updated_at",
-            insertable = false,
             nullable = false
     )
     private Instant updatedAt;

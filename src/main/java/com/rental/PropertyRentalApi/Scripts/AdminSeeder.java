@@ -11,6 +11,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import static com.rental.PropertyRentalApi.Exception.ErrorsExceptionFactory.notFound;
@@ -55,7 +56,7 @@ public class AdminSeeder implements CommandLineRunner {
                 .username("admin")
                 .email(adminEmail)
                 .password(passwordEncoder.encode("Admin@123"))
-                .roles(Set.of(adminRole))
+                .roles(new HashSet<>(Set.of(adminRole)))
                 .enabled(true)
                 .build();
 
