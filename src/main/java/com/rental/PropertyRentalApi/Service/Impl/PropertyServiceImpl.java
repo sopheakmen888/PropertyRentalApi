@@ -34,6 +34,7 @@ public class PropertyServiceImpl implements PropertyService {
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
     private final FavoritesRepository favoritesRepository;
+    private final ReviewRepository reviewRepository;
     private final PropertyMapper propertyMapper;
     private final AuthUtil authUtil;
     private final HelperFunction helperFunction;
@@ -50,7 +51,7 @@ public class PropertyServiceImpl implements PropertyService {
 
         // Fetch paginated data
         Page<Properties> propertyPage = propertyRepository.findAll(pageable);
- 
+
         // Check if page is empty
         if (propertyPage.isEmpty()) {
             throw notFound("Properties not found.");
@@ -74,6 +75,7 @@ public class PropertyServiceImpl implements PropertyService {
 
         return new PaginatedResponse<>(propertyResponses, paginationMeta);
     }
+
 
     // ==============
     // GET BY ID

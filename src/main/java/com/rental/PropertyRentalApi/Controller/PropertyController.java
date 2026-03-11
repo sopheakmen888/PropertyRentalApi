@@ -130,7 +130,7 @@ public class PropertyController {
     // ============================
     // ADD FAVORITE
     // ============================
-    @PostMapping("/properties/{id}/favorite")
+    @PostMapping("/properties/{propertyId}/favorite")
     public ApiResponse<Void> addFavorite(@PathVariable Long propertyId) {
 
         Users currentUser = authUtil.getAuthenticatedUser();
@@ -147,7 +147,7 @@ public class PropertyController {
     // ============================
     // REMOVE FAVORITE
     // ============================
-    @DeleteMapping("/properties/{id}/favorite")
+    @DeleteMapping("/properties/{propertyId}/favorite")
     public ApiResponse<Void> removeFavorite(@PathVariable Long propertyId) {
         Users currentUser = authUtil.getAuthenticatedUser()
                 ;

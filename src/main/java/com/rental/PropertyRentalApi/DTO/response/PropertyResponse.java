@@ -1,10 +1,15 @@
 package com.rental.PropertyRentalApi.DTO.response;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.math.BigDecimal;
 import java.util.List;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class PropertyResponse {
 
     private Long id;
@@ -19,4 +24,6 @@ public class PropertyResponse {
     private CategoryResponse category;
     private UserResponse createdBy;
     private List<String> images;
+    private Long reviewCount;
+    private Long favoriteCount;
 }
