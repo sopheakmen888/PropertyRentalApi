@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface PropertyRepository extends JpaRepository<Properties, Long>,
@@ -17,10 +18,14 @@ public interface PropertyRepository extends JpaRepository<Properties, Long>,
 
     boolean existsByTitle(String title);
 
-    @EntityGraph(attributePaths = {"images"})
+    @EntityGraph(attributePaths = {"images", "createdBy", "category"})
     Page<Properties> findAll(Pageable pageable);
+
+    @EntityGraph(attributePaths = {"images", "createdBy", "category"})
+    Optional<Properties> findById(Long id);
 
 
     // Find properties created by a specific user
+    @EntityGraph(attributePaths = {"images", "createdBy", "category"})
     List<Properties> findAllByCreatedBy(Users user);
 }

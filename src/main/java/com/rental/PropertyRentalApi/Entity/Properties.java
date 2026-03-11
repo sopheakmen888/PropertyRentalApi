@@ -2,10 +2,11 @@ package com.rental.PropertyRentalApi.Entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -57,25 +58,22 @@ public class Properties {
     @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UploadsImages> images;
 
-    @Column(nullable = false, updatable = false)
+    @CreationTimestamp
+    @Column(
+            name = "created_at",
+            nullable = false,
+            updatable = false
+    )
     private Instant createdAt;
 
-    @Column(nullable = false)
+    @UpdateTimestamp
+    @Column(
+            name = "updated_at",
+            nullable = false
+    )
     private Instant updatedAt;
 
     @Column(nullable = false)
-    private boolean deleted;
+    private boolean deleted = false;
 
-//    @PrePersist
-//    protected void onCreate() {
-//        Instant now = Instant.now();
-//        this.createdAt = now;
-//        this.updatedAt = now;
-//        this.deleted = false;
-//    }
-//
-//    @PreUpdate
-//    protected void onUpdate() {
-//        this.updatedAt = Instant.now();
-//    }
 }
