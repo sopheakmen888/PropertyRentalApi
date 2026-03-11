@@ -50,6 +50,7 @@ public class AgentSeeder implements CommandLineRunner {
                         .username("john_agent")
                         .email("john.agent@gmail.com")
                         .password(passwordEncoder.encode("John@123"))
+                        .phone("097 615 204")
                         .roles(new HashSet<>(Set.of(agentRole)))
                         .enabled(true)
                         .build(),
@@ -59,6 +60,7 @@ public class AgentSeeder implements CommandLineRunner {
                         .username("emily_agent")
                         .email("emily.agent@gmail.com")
                         .password(passwordEncoder.encode("Emily@123"))
+                        .phone("088 349 572")
                         .roles(new HashSet<>(Set.of(agentRole)))
                         .enabled(true)
                         .build(),
@@ -68,6 +70,7 @@ public class AgentSeeder implements CommandLineRunner {
                         .username("michael_agent")
                         .email("michael.agent@gmail.com")
                         .password(passwordEncoder.encode("Michael@123"))
+                        .phone("071 926 438")
                         .roles(new HashSet<>(Set.of(agentRole)))
                         .enabled(true)
                         .build(),
@@ -77,6 +80,7 @@ public class AgentSeeder implements CommandLineRunner {
                         .username("sarah_agent")
                         .email("sarah.agent@gmail.com")
                         .password(passwordEncoder.encode("Sarah@123"))
+                        .phone("089 754 163")
                         .roles(new HashSet<>(Set.of(agentRole)))
                         .enabled(true)
                         .build(),
@@ -86,6 +90,7 @@ public class AgentSeeder implements CommandLineRunner {
                         .username("david_agent")
                         .email("david.agent@gmail.com")
                         .password(passwordEncoder.encode("David@123"))
+                        .phone("012 638 905")
                         .roles(new HashSet<>(Set.of(agentRole)))
                         .enabled(true)
                         .build()
