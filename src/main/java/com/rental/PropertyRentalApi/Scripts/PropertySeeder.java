@@ -45,7 +45,7 @@ public class PropertySeeder implements CommandLineRunner {
                 new BigDecimal("10"),
                 new BigDecimal("5"),
                 "house",
-                "Toul Tompoung"
+                "Ta Khmau Commune"
         );
                 
 
@@ -57,7 +57,7 @@ public class PropertySeeder implements CommandLineRunner {
                 new BigDecimal("20"),
                 new BigDecimal("10"),
                 "apartment",
-                "Boeng Keng Kang II"
+                "Tonle Bassac"
         );
 
         seedProperty(owner,
@@ -68,7 +68,7 @@ public class PropertySeeder implements CommandLineRunner {
                 new BigDecimal("30"),
                 new BigDecimal("15"),
                 "condo",
-                "Boeng Keng Kang I"
+                "Bakong Commune"
         );
 
         log.info("Property seeding completed.");

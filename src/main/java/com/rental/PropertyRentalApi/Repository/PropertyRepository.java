@@ -31,24 +31,4 @@ public interface PropertyRepository extends JpaRepository<Properties, Long>,
     @EntityGraph(attributePaths = {"images", "createdBy", "category"})
     List<Properties> findAllByCreatedBy(Users user);
 
-    @Query("""
-    SELECT new com.rental.PropertyRentalApi.DTO.response.PropertyResponse(
-        p.id,
-        p.title,
-        p.description,
-        p.address,
-        p.price,
-        p.electricityCost,
-        p.waterCost,
-        p.available,
-        COUNT(DISTINCT r.id),
-        COUNT(DISTINCT f.id)
-    )
-    FROM Properties p
-    LEFT JOIN Reviews r ON r.property = p
-    LEFT JOIN Favorites f ON f.property = p
-    GROUP BY p.id
-    """)
-    Page<PropertyResponse> findAllWithCounts(Pageable pageable);
-
 }

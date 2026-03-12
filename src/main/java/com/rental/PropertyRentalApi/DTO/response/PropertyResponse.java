@@ -24,6 +24,6 @@ public class PropertyResponse {
     private CategoryResponse category;
     private UserResponse createdBy;
     private List<String> images;
-    private Long reviewCount;
-    private Long favoriteCount;
+//    private Long reviewCount;
+//    private Long favoriteCount;
 }
