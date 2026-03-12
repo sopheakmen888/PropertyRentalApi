@@ -20,9 +20,9 @@ public class ProvinceSeeder implements CommandLineRunner {
     public void run(String... args) throws Exception {
         log.info("Seeding provinces...");
 
-        seedProvince("something");
-        seedProvince("something2");
-        seedProvince("something3");
+        seedProvince("Kandal Province");
+        seedProvince("Siem Reap Province");
+        seedProvince("Phnom Penh");
 
         log.info("Seed completed.");
     }

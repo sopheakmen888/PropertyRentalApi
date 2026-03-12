@@ -82,10 +82,11 @@ public class SecurityConfig {
                 // AUTHORIZATION RULES
                 // ============================
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
-                                .requestMatchers("/api/public/**").permitAll()
-                                .requestMatchers("/api/uploads/**").permitAll()
-                                .requestMatchers("/api/location/filter").permitAll()
+                                .requestMatchers("/api/**").permitAll()
+//                        .requestMatchers("/api/auth/**").permitAll()
+//                                .requestMatchers("/api/public/**").permitAll()
+//                                .requestMatchers("/api/uploads/**").permitAll()
+//                                .requestMatchers("/api/location/filter").permitAll()
 //                                .requestMatchers("/api/users/profile").permitAll()
 
                                 // ============================
