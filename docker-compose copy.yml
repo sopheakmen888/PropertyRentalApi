@@ -1,0 +1,41 @@
+services:
+  db:
+    image: postgres:16
+    container_name: property_db
+    restart: "no"
+    env_file:
+      - .env
+    ports:
+      - "5434:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    mem_limit: 1g
+
+  app:
+    build: .
+    container_name: property_app
+    restart: "no"
+    depends_on:
+      - db
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    mem_limit: 1g
+    environment:
+      - JAVA_TOOL_OPTIONS=-Xms256m -Xmx512m
+
+volumes:
+  db_data:
+
+#  app:
+#    build: .
+#    container_name: property_app
+#    restart: "no"
+#    env_file:
+#      - .env
+#    ports:
+#      - "8081:8081"
+#    mem_limit: 1g
+#    environment:
+#      - JAVA_TOOL_OPTIONS=-Xms256m -Xmx512m

@@ -1,41 +1,24 @@
 services:
-  db:
-    image: postgres:16
-    container_name: property_db
-    restart: "no"
-    env_file:
-      - .env
-    ports:
-      - "5434:5432"
-    volumes:
-      - db_data:/var/lib/postgresql/data
-    mem_limit: 1g
-
   app:
     build: .
-    container_name: property_app
-    restart: "no"
-    depends_on:
-      - db
-    env_file:
-      - .env
-    ports:
-      - "8000:8000"
-    mem_limit: 1g
+    container_name: property_rental_api
+    expose:
+      - "8081"
     environment:
-      - JAVA_TOOL_OPTIONS=-Xms256m -Xmx512m
+      SPRING_DATASOURCE_URL: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+      SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      SPRING_PROFILES_ACTIVE: docker
+      SERVER_PORT: 8081
+    networks:
+      - demo_proxy
+      - proxy
 
-volumes:
-  db_data:
+networks:
+  demo_proxy:
+    external: true
+    name: demo_proxy
 
-#  app:
-#    build: .
-#    container_name: property_app
-#    restart: "no"
-#    env_file:
-#      - .env
-#    ports:
-#      - "8081:8081"
-#    mem_limit: 1g
-#    environment:
-#      - JAVA_TOOL_OPTIONS=-Xms256m -Xmx512m
+  proxy:
+    external: true
+    name: proxy
