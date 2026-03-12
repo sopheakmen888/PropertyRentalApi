@@ -17,9 +17,7 @@ services:
       SPRING_ACCESS_TOKEN_EXPIRE: 900000
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_JPA_SHOW_SQL: true
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_JWT_SECRET: ${SPRING_JWT_SECRET}
     networks:
       - demo_proxy
       - proxy
