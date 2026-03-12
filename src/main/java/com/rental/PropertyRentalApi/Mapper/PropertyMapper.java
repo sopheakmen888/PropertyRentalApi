@@ -31,6 +31,7 @@ public interface PropertyMapper {
     // ============
     @Mapping(source = "category", target = "category")
     @Mapping(target = "images", expression = "java(mapImages(property.getImages()))")
+    @Mapping(target = "createdBy", source = "createdBy")
     PropertyResponse toPropertyResponse(Properties property);
 
     // ============

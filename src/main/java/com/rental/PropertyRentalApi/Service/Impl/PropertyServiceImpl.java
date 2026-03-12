@@ -7,7 +7,6 @@ import com.rental.PropertyRentalApi.DTO.response.PropertyResponse;
 import com.rental.PropertyRentalApi.Entity.*;
 import com.rental.PropertyRentalApi.Mapper.PropertyMapper;
 import com.rental.PropertyRentalApi.Repository.*;
-import com.rental.PropertyRentalApi.Service.Jwt.JwtService;
 import com.rental.PropertyRentalApi.Service.PropertyService;
 import com.rental.PropertyRentalApi.Specification.PropertySpecification;
 import com.rental.PropertyRentalApi.Utils.AuthUtil;
@@ -35,7 +34,7 @@ public class PropertyServiceImpl implements PropertyService {
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
     private final FavoritesRepository favoritesRepository;
-    private final JwtService jwtService;
+    private final ReviewRepository reviewRepository;
     private final PropertyMapper propertyMapper;
     private final AuthUtil authUtil;
     private final HelperFunction helperFunction;
@@ -52,7 +51,7 @@ public class PropertyServiceImpl implements PropertyService {
 
         // Fetch paginated data
         Page<Properties> propertyPage = propertyRepository.findAll(pageable);
- 
+
         // Check if page is empty
         if (propertyPage.isEmpty()) {
             throw notFound("Properties not found.");
@@ -76,6 +75,7 @@ public class PropertyServiceImpl implements PropertyService {
 
         return new PaginatedResponse<>(propertyResponses, paginationMeta);
     }
+
 
     // ==============
     // GET BY ID

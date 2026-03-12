@@ -20,9 +20,9 @@ public class CommuneSeeder implements CommandLineRunner {
     public void run(String... args) throws Exception {
         log.info("Seeding Communes...");
 
-        seedCommune("Toul Tompoung");
-        seedCommune("Boeng Keng Kang I");
-        seedCommune("Boeng Keng Kang II");
+        seedCommune("Ta Khmau Commune");
+        seedCommune("Tonle Bassac");
+        seedCommune("Bakong Commune");
 
         log.info("Seeding completed.");
     }

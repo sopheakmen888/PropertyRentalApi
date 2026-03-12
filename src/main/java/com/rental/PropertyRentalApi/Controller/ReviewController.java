@@ -21,7 +21,7 @@ public class ReviewController {
     // ==============
     // CREATE REVIEW FOR A PROPERTY
     // ==============
-    @PostMapping("/{propertyId}")
+    @PostMapping("/property/{propertyId}")
     public ApiResponse<ReviewResponse> createReview(
             @PathVariable Long propertyId,
             @Valid @RequestBody ReviewCreateRequest request
@@ -71,7 +71,7 @@ public class ReviewController {
     // ==============
     // GET ALL REVIEWS FOR A PROPERTY
     // ==============
-    @GetMapping("/{propertyId}")
+    @GetMapping("/property/{propertyId}")
     public ApiResponse<Page<ReviewResponse>> getReviewsByProperty(
             @PathVariable Long propertyId,
             @RequestParam(defaultValue = "0") int page,

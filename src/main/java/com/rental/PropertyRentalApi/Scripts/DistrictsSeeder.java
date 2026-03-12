@@ -20,9 +20,9 @@ public class DistrictsSeeder implements CommandLineRunner {
     public void run(String... args) throws Exception {
         log.info("Seeding districts...");
 
-        seedDistricts("districts1");
-        seedDistricts("districts2");
-        seedDistricts("districts3");
+        seedDistricts("Ta Khmau");
+        seedDistricts("Prasat Bakong District");
+        seedDistricts("Chamkar Mon");
 
         log.info("Seed completed.");
     }

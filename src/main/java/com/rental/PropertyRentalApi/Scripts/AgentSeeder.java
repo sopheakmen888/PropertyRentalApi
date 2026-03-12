@@ -11,6 +11,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -49,7 +50,8 @@ public class AgentSeeder implements CommandLineRunner {
                         .username("john_agent")
                         .email("john.agent@gmail.com")
                         .password(passwordEncoder.encode("John@123"))
-                        .roles(Set.of(agentRole))
+                        .phone("097 615 204")
+                        .roles(new HashSet<>(Set.of(agentRole)))
                         .enabled(true)
                         .build(),
 
@@ -58,7 +60,8 @@ public class AgentSeeder implements CommandLineRunner {
                         .username("emily_agent")
                         .email("emily.agent@gmail.com")
                         .password(passwordEncoder.encode("Emily@123"))
-                        .roles(Set.of(agentRole))
+                        .phone("088 349 572")
+                        .roles(new HashSet<>(Set.of(agentRole)))
                         .enabled(true)
                         .build(),
 
@@ -67,7 +70,8 @@ public class AgentSeeder implements CommandLineRunner {
                         .username("michael_agent")
                         .email("michael.agent@gmail.com")
                         .password(passwordEncoder.encode("Michael@123"))
-                        .roles(Set.of(agentRole))
+                        .phone("071 926 438")
+                        .roles(new HashSet<>(Set.of(agentRole)))
                         .enabled(true)
                         .build(),
 
@@ -76,7 +80,8 @@ public class AgentSeeder implements CommandLineRunner {
                         .username("sarah_agent")
                         .email("sarah.agent@gmail.com")
                         .password(passwordEncoder.encode("Sarah@123"))
-                        .roles(Set.of(agentRole))
+                        .phone("089 754 163")
+                        .roles(new HashSet<>(Set.of(agentRole)))
                         .enabled(true)
                         .build(),
 
@@ -85,7 +90,8 @@ public class AgentSeeder implements CommandLineRunner {
                         .username("david_agent")
                         .email("david.agent@gmail.com")
                         .password(passwordEncoder.encode("David@123"))
-                        .roles(Set.of(agentRole))
+                        .phone("012 638 905")
+                        .roles(new HashSet<>(Set.of(agentRole)))
                         .enabled(true)
                         .build()
         );
